@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sistema COMEDOR - INTERNADO</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="{% static 'css/base/base.css' %}?v=4">
+
+   
+
+    {% block styles %}{% endblock %}
+</head>
+
+
+<body class="layout">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-scroll">
+
+            <div class="profile">
+
+                <a href="{% url 'index' %}">
+                    <img src="https://vtryizusiddlydztsgax.supabase.co/storage/v1/object/public/fotosEstudinates/2logo.png" class="avatar" alt="Logo">
+                </a>
+
+                <h3> Administrador </h3>
+                <p> Sesión Activa </p>
+
+            </div>
+
+
+            <nav class="menu">
+
+                <!-- INICIO -->
+
+                <a href="{% url 'dashboard' %}">
+                    <i class="fa-solid fa-house"></i>
+                    <span> Inicio </span>
+                </a>
+
+
+                <!-- COMEDOR -->
+
+                <button type="button" class="menu-toggle" data-menu="comedor">
+
+                    <span class="menu-toggle-texto">
+                        <i class="fa-solid fa-utensils"></i>
+                        <span> Comedor </span>
+                    </span>
+
+                    <i class="fa-solid fa-chevron-down menu-flecha"></i>
+
+                </button>
+
+                <div id="submenu-comedor" class="submenu">
+
+                    <a href="{% url 'dashboard_comedor' %}">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span> Dashboard </span>
+                    </a>
+
+                    <a href="{% url 'reportes' %}">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <span> Reporte </span>
+                    </a>
+
+                </div>
+
+
+                <!-- INTERNADO -->
+
+                <button type="button" class="menu-toggle" data-menu="internado">
+
+                    <span class="menu-toggle-texto">
+                        <i class="fa-solid fa-building-user"></i>
+                        <span> Internado </span>
+                    </span>
+
+                    <i class="fa-solid fa-chevron-down menu-flecha"></i>
+
+                </button>
+
+                <div id="submenu-internado" class="submenu">
+
+                    <a href="{% url 'dashboard_internado' %}">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span> Dashboard </span>
+                    </a>
+
+                    <a href="{% url 'reporte_internado' %}">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <span> Reporte </span>
+                    </a>
+
+                </div>
+
+
+                <!-- ESTUDIANTES -->
+
+                <a href="{% url 'estudiantes' %}">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span> Estudiantes </span>
+                </a>
+
+
+                <!-- GUARDAS -->
+
+                <a href="{% url 'guardas' %}">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span> Guardas </span>
+                </a>
+
+
+                <!-- USUARIOS -->
+
+                <a href="{% url 'usuarios' %}">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <span> Usuarios </span>
+                </a>
+
+            </nav>
+
+        </div>
+
+
+        <!-- CERRAR SESION -->
+
+        <div class="logout">
+
+            <a href="{% url 'index' %}">
+                <i class="fa-solid fa-power-off"></i>
+                <span> Cerrar Sesión </span>
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENIDO -->
+
+    <main class="contenido">
+
+        {% block content %}
+
+        <div class="sin-contenido"> Selecciona una opción </div>
+
+        {% endblock %}
+
+    </main>
+
+
+    <!-- ACORDEON -->
+
+    <script>
+
+        const botonesMenu = document.querySelectorAll(".menu-toggle");
+
+        botonesMenu.forEach(boton => {
+
+            boton.addEventListener("click", () => {
+
+                const nombreMenu = boton.dataset.menu;
+                const submenu = document.getElementById(`submenu-${nombreMenu}`);
+                const estabaAbierto = submenu.classList.contains("abierto");
+
+                botonesMenu.forEach(otroBoton => {
+
+                    const otroMenu = otroBoton.dataset.menu;
+                    const otroSubmenu = document.getElementById(`submenu-${otroMenu}`);
+
+                    otroSubmenu.classList.remove("abierto");
+                    otroBoton.classList.remove("activo");
+
+                });
+
+                if (!estabaAbierto) {
+                    submenu.classList.add("abierto");
+                    boton.classList.add("activo");
+                }
+
+            });
+
+        });
+
+    </script>
+
+
+    <script src="{% static 'js/base/menu.js' %}"></script>
+
+    {% block scripts %}{% endblock %}
+
+</body>
+
+</html>

@@ -1,0 +1,1097 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block content %}
+
+<div class="min-h-screen bg-slate-50">
+
+    <!-- ====================================================== -->
+    <!-- CABECERA -->
+    <!-- ====================================================== -->
+
+    <header class="bg-white px-8 py-5 border-b border-slate-100">
+
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+
+            <!-- TITULO -->
+
+            <div>
+
+                <h1 class="text-3xl font-black text-slate-800 tracking-tight">
+                    Reporte de Uso del Comedor
+                </h1>
+
+                <p class="text-sm text-slate-500 mt-1">
+                    Seguimiento del aprovechamiento por estudiante y tiempo de comida
+                </p>
+
+            </div>
+
+
+            <!-- EXPORTACIONES -->
+
+            <div class="flex items-center gap-2 no-print">
+
+                <!-- EXCEL -->
+
+                <a href="{% url 'exportar_reporte_excel' %}?desde={{ desde }}&hasta={{ hasta }}&carrera={{ carrera|urlencode }}&ano={{ ano|urlencode }}"
+                   class="flex items-center gap-2 border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-4 py-2.5 rounded-xl text-xs font-bold transition">
+
+                    <i class="fa-solid fa-file-excel"></i>
+                    Exportar Excel
+
+                </a>
+
+
+                <!-- PDF -->
+
+                <button type="button"
+                        onclick="window.print()"
+                        class="flex items-center gap-2 border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-xl text-xs font-bold transition">
+
+                    <i class="fa-solid fa-file-pdf"></i>
+                    Descargar PDF
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- ====================================================== -->
+    <!-- CONTENIDO -->
+    <!-- ====================================================== -->
+
+    <section class="px-8 py-5 space-y-5">
+
+
+        <!-- ================================================== -->
+        <!-- FILTROS -->
+        <!-- ================================================== -->
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm px-5 py-4 no-print">
+
+            <form method="GET"
+                  class="flex flex-col xl:flex-row xl:items-end gap-3">
+
+
+                <!-- DESDE -->
+
+                <div class="w-full sm:w-[165px] shrink-0">
+
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                        Desde
+                    </label>
+
+                    <input type="date"
+                           name="desde"
+                           value="{{ desde }}"
+                           class="w-full border border-slate-200 bg-white rounded-xl px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF]">
+
+                </div>
+
+
+                <!-- HASTA -->
+
+                <div class="w-full sm:w-[165px] shrink-0">
+
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                        Hasta
+                    </label>
+
+                    <input type="date"
+                           name="hasta"
+                           value="{{ hasta }}"
+                           class="w-full border border-slate-200 bg-white rounded-xl px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF]">
+
+                </div>
+
+
+                <!-- CARRERA -->
+
+                <div class="w-full xl:flex-1">
+
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                        Carrera
+                    </label>
+
+                    <select name="carrera"
+                            class="w-full border border-slate-200 bg-white rounded-xl px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF]">
+
+                        <option value="">Todas</option>
+
+                        {% for c in carreras %}
+
+                            <option value="{{ c }}" {% if carrera == c %}selected{% endif %}>
+                                {{ c }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- AÑO -->
+
+                <div class="w-full sm:w-[150px] shrink-0">
+
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                        Año
+                    </label>
+
+                    <select name="ano"
+                            class="w-full border border-slate-200 bg-white rounded-xl px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF]">
+
+                        <option value="">Todos</option>
+
+                        <option value="1er Año" {% if ano == "1er Año" %}selected{% endif %}>
+                            1er Año
+                        </option>
+
+                        <option value="2do Año" {% if ano == "2do Año" %}selected{% endif %}>
+                            2do Año
+                        </option>
+
+                        <option value="3er Año" {% if ano == "3er Año" %}selected{% endif %}>
+                            3er Año
+                        </option>
+
+                        <option value="4to Año" {% if ano == "4to Año" %}selected{% endif %}>
+                            4to Año
+                        </option>
+
+                        <option value="5to Año" {% if ano == "5to Año" %}selected{% endif %}>
+                            5to Año
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- GENERAR -->
+
+                <button type="submit"
+                        class="h-[42px] shrink-0 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-5 rounded-xl text-xs font-bold transition shadow-sm whitespace-nowrap">
+
+                    <i class="fa-solid fa-chart-line mr-2"></i>
+                    Generar Reporte
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- ================================================== -->
+        <!-- INDICADORES -->
+        <!-- ================================================== -->
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+
+            <!-- ESTUDIANTES EVALUADOS -->
+
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
+
+                <div class="flex items-center gap-4">
+
+                    <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl shrink-0">
+
+                        <i class="fa-solid fa-users"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <p class="text-sm font-semibold text-slate-500">
+                            Estudiantes evaluados
+                        </p>
+
+                        <h3 class="text-3xl font-black text-blue-600 mt-1">
+                            {{ total_estudiantes }}
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PROMEDIO -->
+
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
+
+                <div class="flex items-center gap-4">
+
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shrink-0">
+
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <p class="text-sm font-semibold text-slate-500">
+                            Promedio del período
+                        </p>
+
+                        <h3 class="text-3xl font-black text-emerald-600 mt-1">
+                            {{ promedio_mensual }}%
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- BAJO 60 -->
+
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
+
+                <div class="flex items-center gap-4">
+
+                    <div class="w-14 h-14 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shrink-0">
+
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <p class="text-sm font-semibold text-slate-500">
+                            Bajo 60%
+                        </p>
+
+                        <h3 class="text-3xl font-black text-red-500 mt-1">
+                            {{ estudiantes_bajo_60 }}
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================================================== -->
+        <!-- TABLA -->
+        <!-- ================================================== -->
+
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+
+
+            <!-- CABECERA -->
+
+            <div class="px-5 py-4 border-b border-slate-100 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+
+                <div>
+
+                    <h3 class="text-lg font-black text-slate-800">
+                        Aprovechamiento por estudiante
+                    </h3>
+
+                    <p class="text-xs text-slate-400 mt-1">
+
+                        {{ desde }}
+                        hasta
+                        {{ hasta }}
+
+                        <span class="mx-1">•</span>
+
+                        {{ dias_periodo }} días evaluados
+
+                    </p>
+
+                </div>
+
+
+                <div class="flex items-center gap-2 text-xs text-slate-400">
+
+                    <i class="fa-solid fa-circle-info text-blue-500"></i>
+
+                    Menor del 60% se considera bajo uso
+
+                </div>
+
+            </div>
+
+
+
+            <!-- TABLA -->
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full text-left min-w-[900px]">
+
+
+                    <!-- ENCABEZADO -->
+
+                    <thead class="bg-[#1E3A8A] text-white uppercase text-[11px] font-black">
+
+                        <tr>
+
+                            <th class="px-5 py-4">
+                                Estudiante
+                            </th>
+
+                            <th class="px-5 py-4">
+                                Desayuno
+                            </th>
+
+                            <th class="px-5 py-4">
+                                Almuerzo
+                            </th>
+
+                            <th class="px-5 py-4">
+                                Cena
+                            </th>
+
+                            <th class="px-5 py-4">
+                                Total mensual
+                            </th>
+
+                            <th class="px-5 py-4 text-center">
+                                Estado
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <!-- CUERPO -->
+
+                    <tbody class="divide-y divide-slate-100">
+
+                        {% for r in estudiantes_pagina %}
+
+                        <tr class="hover:bg-blue-50/30 transition">
+
+
+                            <!-- ESTUDIANTE -->
+
+                            <td class="px-5 py-4">
+
+                                <p class="text-sm font-bold text-slate-700">
+                                    {{ r.estudiante }}
+                                </p>
+
+                                <p class="text-[10px] text-slate-400 mt-1">
+                                    {{ r.carnet }}
+                                </p>
+
+                            </td>
+
+
+
+                            <!-- DESAYUNO -->
+
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center gap-3">
+
+                                    <span class="text-xs font-bold text-slate-600 w-12">
+                                        {{ r.porcentaje_desayuno }}%
+                                    </span>
+
+
+                                    <div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+
+                                        <div class="h-full rounded-full
+                                            {% if r.porcentaje_desayuno < 60 %}
+                                                bg-orange-400
+                                            {% else %}
+                                                bg-emerald-500
+                                            {% endif %}"
+                                             style="width: {{ r.porcentaje_desayuno|unlocalize }}%;">
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+
+                            <!-- ALMUERZO -->
+
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center gap-3">
+
+                                    <span class="text-xs font-bold text-slate-600 w-12">
+                                        {{ r.porcentaje_almuerzo }}%
+                                    </span>
+
+
+                                    <div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+
+                                        <div class="h-full rounded-full
+                                            {% if r.porcentaje_almuerzo < 60 %}
+                                                bg-orange-400
+                                            {% else %}
+                                                bg-emerald-500
+                                            {% endif %}"
+                                             style="width: {{ r.porcentaje_almuerzo|unlocalize }}%;">
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+
+                            <!-- CENA -->
+
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center gap-3">
+
+                                    <span class="text-xs font-bold text-slate-600 w-12">
+                                        {{ r.porcentaje_cena }}%
+                                    </span>
+
+
+                                    <div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+
+                                        <div class="h-full rounded-full
+                                            {% if r.porcentaje_cena < 60 %}
+                                                bg-red-400
+                                            {% else %}
+                                                bg-emerald-500
+                                            {% endif %}"
+                                             style="width: {{ r.porcentaje_cena|unlocalize }}%;">
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+
+                            <!-- TOTAL -->
+
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center gap-3">
+
+                                    <span class="text-xs font-black text-slate-700 w-12">
+                                        {{ r.porcentaje_total }}%
+                                    </span>
+
+
+                                    <div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+
+                                        <div class="h-full rounded-full
+                                            {% if r.porcentaje_total < 60 %}
+                                                bg-orange-500
+                                            {% else %}
+                                                bg-[#1E40AF]
+                                            {% endif %}"
+                                             style="width: {{ r.porcentaje_total|unlocalize }}%;">
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+
+                            <!-- ESTADO -->
+
+                            <td class="px-5 py-4 text-center">
+
+                                {% if r.estado == "Bajo uso" %}
+
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 text-red-600 text-[10px] font-black">
+
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                                        Bajo uso
+
+                                    </span>
+
+
+                                {% elif r.estado == "Excelente" %}
+
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black">
+
+                                        <i class="fa-solid fa-star"></i>
+
+                                        Excelente
+
+                                    </span>
+
+
+                                {% else %}
+
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black">
+
+                                        <i class="fa-solid fa-check"></i>
+
+                                        Normal
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td colspan="6"
+                                class="py-16 text-center">
+
+                                <i class="fa-solid fa-chart-column text-4xl text-slate-200 mb-3"></i>
+
+                                <p class="text-sm font-semibold text-slate-500">
+                                    No hay información para mostrar
+                                </p>
+
+                                <p class="text-xs text-slate-400 mt-1">
+                                    No se encontraron estudiantes con los filtros seleccionados.
+                                </p>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+
+            <!-- ================================================== -->
+            <!-- PAGINACIÓN -->
+            <!-- ================================================== -->
+
+            {% if estudiantes_pagina.paginator.num_pages > 1 %}
+
+            <div class="px-5 py-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
+
+
+                <!-- INFORMACIÓN -->
+
+                <p class="text-xs text-slate-400">
+
+                    Mostrando
+
+                    <strong class="text-slate-600">
+                        {{ estudiantes_pagina.start_index }}
+                    </strong>
+
+                    a
+
+                    <strong class="text-slate-600">
+                        {{ estudiantes_pagina.end_index }}
+                    </strong>
+
+                    de
+
+                    <strong class="text-slate-600">
+                        {{ estudiantes_pagina.paginator.count }}
+                    </strong>
+
+                    estudiantes
+
+                </p>
+
+
+
+                <!-- BOTONES -->
+
+                <div class="flex items-center gap-1">
+
+
+                    <!-- ANTERIOR -->
+
+                    {% if estudiantes_pagina.has_previous %}
+
+                    <a href="?desde={{ desde }}&hasta={{ hasta }}&carrera={{ carrera|urlencode }}&ano={{ ano|urlencode }}&page={{ estudiantes_pagina.previous_page_number }}"
+                       class="h-9 px-3 rounded-lg border border-slate-200 text-xs font-bold text-slate-500 hover:bg-slate-50 flex items-center gap-2">
+
+                        <i class="fa-solid fa-chevron-left"></i>
+
+                        Anterior
+
+                    </a>
+
+                    {% endif %}
+
+
+
+                    <!-- NÚMEROS -->
+
+                    {% for numero in estudiantes_pagina.paginator.page_range %}
+
+                        {% if numero == estudiantes_pagina.number %}
+
+                            <span class="w-9 h-9 rounded-lg bg-[#1E40AF] text-white flex items-center justify-center text-xs font-bold">
+
+                                {{ numero }}
+
+                            </span>
+
+
+                        {% elif numero >= estudiantes_pagina.number|add:"-2" and numero <= estudiantes_pagina.number|add:"2" %}
+
+                            <a href="?desde={{ desde }}&hasta={{ hasta }}&carrera={{ carrera|urlencode }}&ano={{ ano|urlencode }}&page={{ numero }}"
+                               class="w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 flex items-center justify-center text-xs font-bold">
+
+                                {{ numero }}
+
+                            </a>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+
+
+                    <!-- SIGUIENTE -->
+
+                    {% if estudiantes_pagina.has_next %}
+
+                    <a href="?desde={{ desde }}&hasta={{ hasta }}&carrera={{ carrera|urlencode }}&ano={{ ano|urlencode }}&page={{ estudiantes_pagina.next_page_number }}"
+                       class="h-9 px-3 rounded-lg border border-slate-200 text-xs font-bold text-slate-500 hover:bg-slate-50 flex items-center gap-2">
+
+                        Siguiente
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- ================================================== -->
+        <!-- ALERTAS + GRÁFICA -->
+        <!-- ================================================== -->
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+
+            <!-- ================================================== -->
+            <!-- ALERTAS -->
+            <!-- ================================================== -->
+
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+
+
+                <!-- TITULO -->
+
+                <div class="px-5 py-4 border-b border-slate-100">
+
+                    <div class="flex items-center gap-2">
+
+                        <i class="fa-regular fa-bell text-orange-500"></i>
+
+                        <h3 class="text-sm font-black text-slate-800">
+                            Alertas del período
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- CONTENIDO -->
+
+                <div class="p-5 space-y-5">
+
+
+                    <!-- BAJO 60 -->
+
+                    <div class="flex items-center gap-4">
+
+                        <div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+
+                            <i class="fa-solid fa-users"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <p class="text-sm font-black text-slate-700">
+
+                                {{ estudiantes_bajo_60 }}
+
+                                {% if estudiantes_bajo_60 == 1 %}
+                                    estudiante
+                                {% else %}
+                                    estudiantes
+                                {% endif %}
+
+                            </p>
+
+                            <p class="text-xs text-slate-500 mt-1">
+                                están por debajo del 60% de aprovechamiento durante el período.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="border-t border-slate-100"></div>
+
+
+
+                    <!-- TIEMPO MENOR -->
+
+                    <div class="flex items-center gap-4">
+
+                        <div class="w-12 h-12 rounded-xl bg-red-100 text-red-500 flex items-center justify-center shrink-0">
+
+                            <i class="fa-solid fa-utensils"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <p class="text-sm font-black text-slate-700">
+                                {{ tiempo_menor_uso }}
+                            </p>
+
+                            <p class="text-xs text-slate-500 mt-1">
+                                es el tiempo de comida con menor porcentaje de utilización.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="border-t border-slate-100"></div>
+
+
+
+                    <!-- TOTAL ASISTENCIAS -->
+
+                    <div class="flex items-center gap-4">
+
+                        <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+
+                            <i class="fa-solid fa-clipboard-check"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <p class="text-sm font-black text-slate-700">
+                                {{ total_asistencias }} asistencias
+                            </p>
+
+                            <p class="text-xs text-slate-500 mt-1">
+                                fueron registradas durante el período seleccionado.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================================================== -->
+            <!-- GRÁFICA -->
+            <!-- ================================================== -->
+
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+
+
+                <!-- TITULO -->
+
+                <div class="px-5 py-4 border-b border-slate-100">
+
+                    <h3 class="text-sm font-black text-slate-800">
+                        Uso por tiempo de comida
+                    </h3>
+
+                    <p class="text-xs text-slate-400 mt-1">
+                        Promedio de aprovechamiento durante el período
+                    </p>
+
+                </div>
+
+
+
+                <!-- GRAFICA -->
+
+                <div class="p-5">
+
+                    <div class="h-64">
+
+                        <canvas id="grafico-comidas"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- ESTILOS PARA IMPRESIÓN / PDF -->
+<!-- ====================================================== -->
+
+<style>
+
+@media print {
+
+    aside,
+    nav,
+    .sidebar,
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+    }
+
+    main {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    section {
+        padding: 10px !important;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+// =========================================================
+// DATOS
+// =========================================================
+
+const desayuno = parseFloat(
+    "{{ promedio_desayuno|unlocalize }}"
+) || 0;
+
+const almuerzo = parseFloat(
+    "{{ promedio_almuerzo|unlocalize }}"
+) || 0;
+
+const cena = parseFloat(
+    "{{ promedio_cena|unlocalize }}"
+) || 0;
+
+
+
+// =========================================================
+// GRÁFICA
+// =========================================================
+
+const canvas = document.getElementById("grafico-comidas");
+
+if (canvas) {
+
+    new Chart(canvas, {
+
+        type: "bar",
+
+        data: {
+
+            labels: [
+                "Desayuno",
+                "Almuerzo",
+                "Cena"
+            ],
+
+            datasets: [{
+
+                data: [
+                    desayuno,
+                    almuerzo,
+                    cena
+                ],
+
+                backgroundColor: [
+                    "#F59E0B",
+                    "#22C55E",
+                    "#8B5CF6"
+                ],
+
+                borderRadius: 8,
+
+                borderSkipped: false,
+
+                barThickness: 55
+
+            }]
+
+        },
+
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+
+                legend: {
+                    display: false
+                },
+
+                tooltip: {
+
+                    callbacks: {
+
+                        label: function(context) {
+                            return context.raw + "%";
+                        }
+
+                    }
+
+                }
+
+            },
+
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    max: 100,
+
+                    ticks: {
+
+                        stepSize: 20,
+
+                        callback: function(value) {
+                            return value + "%";
+                        },
+
+                        color: "#64748B",
+
+                        font: {
+                            size: 10
+                        }
+
+                    },
+
+                    grid: {
+                        color: "#F1F5F9"
+                    },
+
+                    border: {
+                        display: false
+                    }
+
+                },
+
+
+                x: {
+
+                    ticks: {
+
+                        color: "#475569",
+
+                        font: {
+                            size: 11,
+                            weight: "600"
+                        }
+
+                    },
+
+                    grid: {
+                        display: false
+                    },
+
+                    border: {
+                        display: false
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

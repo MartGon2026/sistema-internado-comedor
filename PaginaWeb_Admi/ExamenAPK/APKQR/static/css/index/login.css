@@ -1,0 +1,352 @@
+/* ===================================================== */
+/* CONFIGURACIÓN GENERAL */
+/* ===================================================== */
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:0;
+    min-height:100vh;
+    font-family:Arial, Helvetica, sans-serif;
+
+    /* Azul oscuro más cercano al estilo de INATEC */
+    background:
+        linear-gradient(
+            135deg,
+            #061F49 0%,
+            #0B3D91 55%,
+            #1452A8 100%
+        );
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+
+/* ===================================================== */
+/* CONTENEDOR PRINCIPAL */
+/* ===================================================== */
+
+.login-container{
+    width:100%;
+    min-height:100vh;
+    padding:24px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+
+/* ===================================================== */
+/* TARJETA DEL LOGIN */
+/* ===================================================== */
+
+.login-card{
+    width:100%;
+    max-width:430px;
+
+    background:#ffffff;
+
+    padding:38px 40px 32px;
+
+    border-radius:26px;
+
+    text-align:center;
+
+    border:1px solid rgba(255,255,255,.45);
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.32);
+}
+
+
+/* ===================================================== */
+/* LOGO */
+/* ===================================================== */
+
+.logo-container{
+    width:100%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    margin-bottom:20px;
+}
+
+.login-logo{
+    width:115px;
+    height:115px;
+
+    display:block;
+
+    object-fit:cover;
+
+    border-radius:50%;
+
+    background:#ffffff;
+
+    border:5px solid #D9E6FA;
+
+    box-shadow:
+        0 8px 22px rgba(11,61,145,.24);
+
+    transition:
+        transform .3s ease,
+        box-shadow .3s ease;
+}
+
+.login-logo:hover{
+    transform:scale(1.04);
+
+    box-shadow:
+        0 10px 28px rgba(11,61,145,.32);
+}
+
+
+/* ===================================================== */
+/* ENCABEZADO */
+/* ===================================================== */
+
+.login-header{
+    margin-bottom:28px;
+}
+
+.login-header h1{
+    margin:0;
+
+    color:#172033;
+
+    font-size:26px;
+    font-weight:900;
+
+    letter-spacing:-.5px;
+}
+
+.login-header p{
+    margin:8px 0 0;
+
+    color:#0B3D91;
+
+    font-size:14px;
+    font-weight:700;
+}
+
+
+/* ===================================================== */
+/* FORMULARIO */
+/* ===================================================== */
+
+.login-form{
+    text-align:left;
+}
+
+.input-group{
+    margin-bottom:18px;
+}
+
+.input-group label{
+    display:block;
+
+    margin-bottom:7px;
+
+    color:#374151;
+
+    font-size:12px;
+    font-weight:800;
+
+    text-transform:uppercase;
+}
+
+.input-container{
+    position:relative;
+}
+
+.input-icon{
+    position:absolute;
+
+    left:15px;
+    top:50%;
+
+    transform:translateY(-50%);
+
+    color:#0B3D91;
+
+    font-size:15px;
+
+    pointer-events:none;
+}
+
+.input-container input{
+    width:100%;
+
+    padding:13px 15px 13px 45px;
+
+    border:1px solid #CBD5E1;
+
+    border-radius:12px;
+
+    background:#F8FAFC;
+
+    color:#1F2937;
+
+    font-size:14px;
+
+    outline:none;
+
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease,
+        background .25s ease;
+}
+
+.input-container input::placeholder{
+    color:#9CA3AF;
+}
+
+.input-container input:focus{
+    background:#ffffff;
+
+    border-color:#0B3D91;
+
+    box-shadow:
+        0 0 0 4px rgba(11,61,145,.15);
+}
+
+
+/* ===================================================== */
+/* MENSAJE DE ERROR */
+/* ===================================================== */
+
+.mensaje-error{
+    display:flex;
+    align-items:center;
+    gap:9px;
+
+    margin-bottom:18px;
+
+    padding:12px 14px;
+
+    background:#FEF2F2;
+
+    border:1px solid #FECACA;
+
+    border-radius:11px;
+
+    color:#DC2626;
+
+    font-size:13px;
+    font-weight:700;
+
+    text-align:left;
+}
+
+
+/* ===================================================== */
+/* BOTÓN INGRESAR */
+/* ===================================================== */
+
+.btn-ingresar{
+    width:100%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:9px;
+
+    margin-top:5px;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#0B3D91;
+
+    color:#ffffff;
+
+    font-size:14px;
+    font-weight:900;
+
+    text-transform:uppercase;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 8px 18px rgba(11,61,145,.30);
+
+    transition:
+        background .25s ease,
+        transform .25s ease,
+        box-shadow .25s ease;
+}
+
+.btn-ingresar:hover{
+    background:#082F6B;
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 11px 22px rgba(11,61,145,.38);
+}
+
+.btn-ingresar:active{
+    transform:translateY(0);
+}
+
+
+/* ===================================================== */
+/* PIE DEL LOGIN */
+/* ===================================================== */
+
+.login-footer{
+    margin-top:24px;
+
+    padding-top:20px;
+
+    border-top:1px solid #E5E7EB;
+
+    color:#94A3B8;
+
+    font-size:11px;
+    font-weight:600;
+}
+
+.login-footer i{
+    margin-right:5px;
+
+    color:#0B3D91;
+}
+
+
+/* ===================================================== */
+/* DISEÑO PARA CELULARES */
+/* ===================================================== */
+
+@media (max-width:520px){
+
+    .login-container{
+        padding:16px;
+    }
+
+    .login-card{
+        padding:30px 24px 26px;
+        border-radius:22px;
+    }
+
+    .login-logo{
+        width:100px;
+        height:100px;
+    }
+
+    .login-header h1{
+        font-size:22px;
+    }
+
+}

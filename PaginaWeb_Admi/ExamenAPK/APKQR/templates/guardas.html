@@ -1,0 +1,1761 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="h-screen flex flex-col overflow-hidden bg-slate-50">
+
+
+<!-- ====================================================== -->
+<!-- CABECERA -->
+<!-- ====================================================== -->
+
+<header class="bg-white px-8 py-6 border-b border-gray-100 shrink-0">
+
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+
+        <div>
+            <h1 class="text-3xl font-black text-slate-800 tracking-tight">
+                Personal de Seguridad
+            </h1>
+
+            <p class="text-sm text-slate-500 mt-1">
+                Gestión del personal encargado del control del internado
+            </p>
+        </div>
+
+
+        <button onclick="openGuardModal('create')"
+                class="flex items-center justify-center gap-2 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-5 py-3 rounded-xl text-sm font-bold transition shadow-sm cursor-pointer">
+
+            <i class="fa-solid fa-plus"></i>
+            Nuevo Guarda
+
+        </button>
+
+    </div>
+
+</header>
+
+
+
+<!-- ====================================================== -->
+<!-- CONTENIDO -->
+<!-- ====================================================== -->
+
+<section class="p-8 flex-1 min-h-0 overflow-hidden">
+
+    <div class="bg-white border border-slate-100 rounded-2xl shadow-sm h-full flex flex-col overflow-hidden">
+
+
+        <!-- ================================================== -->
+        <!-- BUSCADOR + CONTADOR -->
+        <!-- ================================================== -->
+
+        <div class="p-4 border-b border-slate-100 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+
+
+            <!-- BUSCADOR -->
+
+            <div class="relative w-full max-w-md">
+
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+
+                <input id="buscar-guarda"
+                       type="text"
+                       oninput="filtrarGuardas()"
+                       placeholder="Buscar por código, nombre o usuario..."
+                       class="w-full border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF]">
+
+            </div>
+
+
+            <!-- CONTADOR -->
+
+            <div class="flex items-center gap-3 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl shrink-0">
+
+                <div class="w-8 h-8 rounded-lg bg-blue-100 text-[#1E40AF] flex items-center justify-center">
+                    <i class="fa-solid fa-shield-halved text-xs"></i>
+                </div>
+
+                <div>
+                    <p id="contador-guardas" class="text-sm font-black text-slate-700">
+                        {{ total_seguridad }} guardas
+                    </p>
+
+                    <p class="text-[10px] text-slate-400">
+                        Personal registrado
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================================================== -->
+        <!-- TABLA - SOLO ESTA PARTE HACE SCROLL -->
+        <!-- ================================================== -->
+
+        <div class="flex-1 min-h-0 overflow-auto">
+
+            <table class="w-full text-left">
+
+
+                <!-- ENCABEZADO FIJO -->
+
+                <thead class="sticky top-0 z-20 bg-[#1E3A8A] text-white uppercase text-[11px] font-black shadow-sm">
+
+                    <tr>
+                        <th class="px-6 py-4 bg-[#1E3A8A]">Código</th>
+                        <th class="px-6 py-4 bg-[#1E3A8A]">Nombre</th>
+                        <th class="px-6 py-4 bg-[#1E3A8A]">Sexo</th>
+                        <th class="px-6 py-4 bg-[#1E3A8A]">Turno</th>
+                        <th class="px-6 py-4 bg-[#1E3A8A]">Usuario</th>
+                        <th class="px-6 py-4 text-center bg-[#1E3A8A]">Operaciones</th>
+                    </tr>
+
+                </thead>
+
+
+
+                <!-- CUERPO -->
+
+                <tbody class="divide-y divide-slate-100">
+
+                    {% for g in guardas_seguridad %}
+
+                    <tr id="guard-row-{{ g.codigo_unico }}"
+                        class="guard-row hover:bg-blue-50/30 transition"
+                        data-codigo="{{ g.codigo_unico }}"
+                        data-nombre="{{ g.nombre }}"
+                        data-apellido="{{ g.apellido|default:'' }}"
+                        data-sexo="{{ g.sexo|default:'' }}"
+                        data-turno="{{ g.turno|default:'' }}"
+                        data-usuario="{{ g.usuario|default:'' }}"
+                        data-foto="{{ g.foto|default:'' }}">
+
+
+                        <!-- CÓDIGO -->
+
+                        <td class="px-6 py-4">
+
+                            <span class="font-mono text-xs font-bold text-slate-600">
+                                {{ g.codigo_unico }}
+                            </span>
+
+                        </td>
+
+
+
+                        <!-- NOMBRE + FOTO -->
+
+                        <td class="px-6 py-4">
+
+                            <div class="flex items-center gap-3">
+
+                                {% if g.foto %}
+
+                                    <img src="{{ g.foto }}"
+                                         alt="{{ g.nombre }}"
+                                         class="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0">
+
+                                {% else %}
+
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 text-[#1E40AF] flex items-center justify-center text-xs font-black shrink-0">
+
+                                        {{ g.nombre|slice:":1"|upper }}
+
+                                    </div>
+
+                                {% endif %}
+
+
+                                <p class="text-sm font-bold text-slate-700">
+                                    {{ g.nombre }}
+                                    {% if g.apellido %}
+                                        {{ g.apellido }}
+                                    {% endif %}
+                                </p>
+
+                            </div>
+
+                        </td>
+
+
+
+                        <!-- SEXO -->
+
+                        <td class="px-6 py-4">
+
+                            {% if g.sexo %}
+
+                                <span class="text-xs font-semibold text-slate-600">
+                                    {{ g.sexo }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-slate-300">—</span>
+
+                            {% endif %}
+
+                        </td>
+
+
+
+                        <!-- TURNO -->
+
+                        <td class="px-6 py-4">
+
+                            {% if g.turno %}
+
+                                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-[10px] font-black">
+
+                                    <i class="fa-solid fa-clock"></i>
+                                    {{ g.turno }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-slate-300">—</span>
+
+                            {% endif %}
+
+                        </td>
+
+
+
+                        <!-- USUARIO -->
+
+                        <td class="px-6 py-4">
+
+                            {% if g.usuario %}
+
+                                <div class="flex items-center gap-2">
+
+                                    <i class="fa-solid fa-user text-slate-300 text-xs"></i>
+
+                                    <span class="text-sm font-bold text-slate-700">
+                                        {{ g.usuario }}
+                                    </span>
+
+                                </div>
+
+                            {% else %}
+
+                                <span class="text-slate-300">—</span>
+
+                            {% endif %}
+
+                        </td>
+
+
+
+                        <!-- OPERACIONES -->
+
+                        <td class="px-6 py-4">
+
+                            <div class="flex justify-center gap-2">
+
+
+                                <!-- EDITAR -->
+
+                                <button onclick="openGuardModal('update', '{{ g.codigo_unico }}')"
+                                        title="Editar guarda"
+                                        class="w-9 h-9 rounded-lg border border-blue-100 bg-blue-50 text-blue-600 hover:bg-blue-100 transition cursor-pointer">
+
+                                    <i class="fa-solid fa-pen"></i>
+
+                                </button>
+
+
+                                <!-- CONTRASEÑA -->
+
+                                <button onclick="openGuardPasswordModal('{{ g.codigo_unico }}')"
+                                        title="Cambiar contraseña"
+                                        class="w-9 h-9 rounded-lg border border-amber-100 bg-amber-50 text-amber-500 hover:bg-amber-100 transition cursor-pointer">
+
+                                    <i class="fa-solid fa-key"></i>
+
+                                </button>
+
+
+                                <!-- ELIMINAR -->
+
+                                <button onclick="openDeleteGuardModal('{{ g.codigo_unico }}')"
+                                        title="Eliminar guarda"
+                                        class="w-9 h-9 rounded-lg border border-red-100 bg-red-50 text-red-500 hover:bg-red-100 transition cursor-pointer">
+
+                                    <i class="fa-solid fa-trash-can"></i>
+
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="6" class="py-14 text-center">
+
+                            <div class="text-slate-300 text-3xl mb-3">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+
+                            <p class="text-sm font-semibold text-slate-500">
+                                No hay personal de seguridad registrado
+                            </p>
+
+                            <p class="text-xs text-slate-400 mt-1">
+                                Agrega personal utilizando el botón Nuevo Guarda.
+                            </p>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- MODAL CREAR / EDITAR -->
+<!-- ====================================================== -->
+
+<div id="modal-guard-form" class="fixed inset-0 bg-black/50 items-center justify-center z-50 hidden">
+
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden mx-4 max-h-[90vh] overflow-y-auto">
+
+
+        <!-- CABECERA -->
+
+        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
+
+            <div>
+
+                <h3 id="guard-modal-title" class="text-lg font-black text-slate-800">
+                    Nuevo Guarda
+                </h3>
+
+                <p id="guard-modal-subtitle" class="text-xs text-slate-400 mt-1">
+                    Información del personal de seguridad
+                </p>
+
+            </div>
+
+
+            <button type="button"
+                    onclick="closeModal('guard-form')"
+                    class="w-8 h-8 rounded-lg bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+
+        <!-- FORMULARIO -->
+
+        <form id="form-guard-data"
+              onsubmit="saveGuard(event)"
+              class="p-6 space-y-4 text-sm">
+
+
+            <!-- ================================================== -->
+            <!-- FOTO -->
+            <!-- ================================================== -->
+
+            <div>
+
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">
+                    Fotografía
+                </label>
+
+
+                <div class="flex items-center gap-4">
+
+
+                    <!-- PREVIEW -->
+
+                    <div onclick="document.getElementById('guard-foto').click()"
+                         class="w-24 h-24 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden cursor-pointer hover:border-blue-300 transition shrink-0">
+
+                        <img id="guard-foto-preview"
+                             src=""
+                             class="w-full h-full object-cover hidden">
+
+
+                        <div id="guard-foto-placeholder" class="text-center text-slate-300">
+
+                            <i class="fa-solid fa-camera text-2xl"></i>
+
+                            <p class="text-[9px] font-bold mt-1">
+                                FOTO
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- SELECCIONAR -->
+
+                    <div>
+
+                        <input id="guard-foto"
+                               type="file"
+                               accept="image/jpeg,image/png,image/webp"
+                               onchange="previsualizarFoto(event)"
+                               class="hidden">
+
+
+                        <button type="button"
+                                onclick="document.getElementById('guard-foto').click()"
+                                class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold cursor-pointer">
+
+                            <i class="fa-solid fa-image mr-1"></i>
+                            Seleccionar foto
+
+                        </button>
+
+
+                        <p class="text-[10px] text-slate-400 mt-2">
+                            JPG, PNG o WEBP
+                        </p>
+
+
+                        <button id="btn-quitar-foto-preview"
+                                type="button"
+                                onclick="quitarFotoPreview()"
+                                class="hidden text-[10px] font-bold text-red-500 mt-2 cursor-pointer">
+
+                            <i class="fa-solid fa-xmark mr-1"></i>
+                            Quitar selección
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================================================== -->
+            <!-- CÓDIGO -->
+            <!-- ================================================== -->
+
+            <div>
+
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                    Código Único
+                </label>
+
+
+                <div class="relative">
+
+                    <i class="fa-solid fa-id-badge absolute left-3 top-1/2 -translate-y-1/2 text-slate-300"></i>
+
+                    <input type="text"
+                           id="guard-codigo"
+                           required
+                           placeholder="Ej. GS001"
+                           class="w-full border border-slate-200 rounded-xl pl-10 pr-3 py-2.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF]">
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================================================== -->
+            <!-- NOMBRE / APELLIDO -->
+            <!-- ================================================== -->
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+
+                <div>
+
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                        Nombre
+                    </label>
+
+                    <input type="text"
+                           id="guard-nombre"
+                           required
+                           placeholder="Nombre"
+                           class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF]">
+
+                </div>
+
+
+                <div>
+
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                        Apellido
+                    </label>
+
+                    <input type="text"
+                           id="guard-apellido"
+                           required
+                           placeholder="Apellido"
+                           class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF]">
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================================================== -->
+            <!-- SEXO / TURNO -->
+            <!-- ================================================== -->
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+
+                <!-- SEXO -->
+
+                <div>
+
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                        Sexo
+                    </label>
+
+
+                    <select id="guard-sexo"
+                            required
+                            class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF] cursor-pointer">
+
+                        <option value="">Seleccione</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- TURNO -->
+
+                <div>
+
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                        Turno
+                    </label>
+
+
+                    <select id="guard-turno"
+                            required
+                            class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF] cursor-pointer">
+
+                        <option value="">Seleccione</option>
+
+                        <option value="Matutino">Matutino</option>
+
+                        <option value="Vespertino">Vespertino</option>
+
+                        <option value="Nocturno">Nocturno</option>
+
+                        <option value="Diurno">Diurno</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================================================== -->
+            <!-- CREDENCIALES AUTOMÁTICAS -->
+            <!-- ================================================== -->
+
+            <div id="aviso-credenciales"
+                 class="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex gap-3">
+
+                <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+
+                    <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+
+                </div>
+
+
+                <div>
+
+                    <p class="text-xs font-bold text-blue-700">
+                        Credenciales automáticas
+                    </p>
+
+                    <p class="text-[11px] text-blue-500 mt-0.5">
+                        El usuario se generará con el nombre y apellido. La contraseña será creada automáticamente.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================================================== -->
+            <!-- BOTONES -->
+            <!-- ================================================== -->
+
+            <div class="flex justify-end gap-2 pt-5 mt-2 border-t border-slate-100">
+
+                <button type="button"
+                        onclick="closeModal('guard-form')"
+                        class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs cursor-pointer">
+
+                    Cancelar
+
+                </button>
+
+
+                <button type="submit"
+                        class="px-5 py-2.5 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white rounded-xl font-bold text-xs shadow-sm cursor-pointer">
+
+                    <i class="fa-solid fa-check mr-1"></i>
+                    Guardar
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- CREDENCIALES GENERADAS -->
+<!-- ====================================================== -->
+
+<div id="modal-credenciales"
+     class="fixed inset-0 bg-black/50 items-center justify-center z-[60] hidden">
+
+    <div class="bg-white w-full max-w-md rounded-3xl p-7 shadow-2xl mx-4">
+
+
+        <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto text-2xl mb-4">
+
+            <i class="fa-solid fa-check"></i>
+
+        </div>
+
+
+        <div class="text-center mb-6">
+
+            <h3 class="text-xl font-black text-slate-800">
+                Guarda registrado
+            </h3>
+
+            <p class="text-xs text-slate-400 mt-1">
+                Entregue estas credenciales al personal registrado.
+            </p>
+
+        </div>
+
+
+
+        <!-- USUARIO -->
+
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 mb-3">
+
+            <p class="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                Usuario
+            </p>
+
+
+            <div class="flex items-center justify-between gap-3">
+
+                <div class="flex items-center gap-2 min-w-0">
+
+                    <i class="fa-solid fa-user text-blue-500"></i>
+
+                    <p id="credencial-usuario"
+                       class="text-lg font-black text-slate-700 truncate"></p>
+
+                </div>
+
+
+                <button onclick="copiarUsuario()"
+                        title="Copiar usuario"
+                        class="w-9 h-9 shrink-0 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 cursor-pointer">
+
+                    <i class="fa-regular fa-copy"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- CONTRASEÑA -->
+
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 mb-4">
+
+            <p class="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                Contraseña temporal
+            </p>
+
+
+            <div class="flex items-center justify-between gap-3">
+
+                <div class="flex items-center gap-2 min-w-0">
+
+                    <i class="fa-solid fa-key text-amber-500"></i>
+
+                    <p id="credencial-password"
+                       class="text-lg font-black tracking-wider text-slate-700 truncate"></p>
+
+                </div>
+
+
+                <button onclick="copiarPassword()"
+                        title="Copiar contraseña"
+                        class="w-9 h-9 shrink-0 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 cursor-pointer">
+
+                    <i class="fa-regular fa-copy"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- COPIAR AMBAS -->
+
+        <button onclick="copiarCredenciales()"
+                class="w-full flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-50 text-slate-600 py-3 rounded-xl text-xs font-bold cursor-pointer">
+
+            <i class="fa-regular fa-copy"></i>
+            Copiar credenciales
+
+        </button>
+
+
+
+        <!-- COPIADO -->
+
+        <div id="mensaje-copiado"
+             class="hidden mt-3 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-xl px-4 py-2.5 text-xs font-bold text-center">
+
+            <i class="fa-solid fa-check mr-1"></i>
+            Copiado correctamente
+
+        </div>
+
+
+
+        <!-- AVISO -->
+
+        <div class="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 mt-4 flex gap-3">
+
+            <i class="fa-solid fa-circle-info text-amber-500 mt-0.5"></i>
+
+            <p class="text-xs text-amber-700">
+                Entregue estas credenciales al guarda antes de cerrar esta ventana.
+            </p>
+
+        </div>
+
+
+
+        <button onclick="cerrarCredenciales()"
+                class="w-full mt-5 py-3 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white rounded-xl text-sm font-bold cursor-pointer">
+
+            Entendido
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- CAMBIAR CONTRASEÑA -->
+<!-- ====================================================== -->
+
+<div id="modal-guard-password"
+     class="fixed inset-0 bg-black/50 items-center justify-center z-50 hidden">
+
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden mx-4">
+
+
+        <div class="px-6 py-5 border-b border-slate-100">
+
+            <div class="w-11 h-11 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center mb-3">
+
+                <i class="fa-solid fa-key"></i>
+
+            </div>
+
+
+            <h3 class="text-lg font-black text-slate-800">
+                Cambiar Contraseña
+            </h3>
+
+
+            <p class="text-xs text-slate-400 mt-1">
+
+                Usuario:
+
+                <b id="guard-password-user"
+                   class="text-slate-600"></b>
+
+            </p>
+
+        </div>
+
+
+
+        <div class="p-6">
+
+            <input type="hidden"
+                   id="guard-password-codigo">
+
+
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                Nueva Contraseña
+            </label>
+
+
+            <input type="password"
+                   id="guard-new-password"
+                   placeholder="Ingrese la nueva contraseña"
+                   class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-100 focus:border-amber-400">
+
+
+
+            <div class="flex justify-end gap-2 pt-5 mt-5 border-t border-slate-100">
+
+                <button type="button"
+                        onclick="closeModal('guard-password')"
+                        class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs cursor-pointer">
+
+                    Cancelar
+
+                </button>
+
+
+                <button onclick="executeGuardPasswordReset()"
+                        class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs cursor-pointer">
+
+                    Actualizar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- ELIMINAR -->
+<!-- ====================================================== -->
+
+<div id="modal-delete-guard"
+     class="fixed inset-0 bg-black/50 items-center justify-center z-50 hidden">
+
+    <div class="bg-white w-full max-w-sm rounded-2xl p-7 text-center shadow-2xl mx-4">
+
+
+        <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+
+            <i class="fa-solid fa-trash-can"></i>
+
+        </div>
+
+
+        <h3 class="text-lg font-black text-slate-800 mb-1">
+            ¿Eliminar guarda?
+        </h3>
+
+
+        <p class="text-xs text-slate-400 mb-2">
+            Esta acción no se puede deshacer.
+        </p>
+
+
+        <p class="text-sm text-slate-600 mb-6">
+
+            Personal:
+
+            <b id="delete-guard-name"></b>
+
+        </p>
+
+
+        <input type="hidden"
+               id="delete-guard-codigo">
+
+
+
+        <div class="flex justify-center gap-2">
+
+            <button onclick="closeModal('delete-guard')"
+                    class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs cursor-pointer">
+
+                Cancelar
+
+            </button>
+
+
+            <button onclick="executeDeleteGuard()"
+                    class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-xs cursor-pointer">
+
+                Eliminar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- CARGANDO -->
+<!-- ====================================================== -->
+
+<div id="modal-guard-loading"
+     class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+
+    <div class="bg-white w-full max-w-xs rounded-2xl p-8 text-center shadow-2xl mx-4">
+
+        <div class="w-14 h-14 border-4 border-slate-200 border-t-[#1E40AF] rounded-full animate-spin mx-auto mb-5"></div>
+
+        <h3 id="guard-loading-title"
+            class="text-lg font-black text-slate-800 mb-2">
+
+            Procesando...
+
+        </h3>
+
+        <p class="text-xs text-slate-400">
+            Espere un momento.
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- MENSAJES -->
+<!-- ====================================================== -->
+
+<div id="modal-guard-message"
+     class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+
+    <div class="bg-white w-full max-w-md rounded-3xl p-8 text-center shadow-2xl mx-4">
+
+        <div id="guard-message-icon-box"
+             class="w-20 h-20 rounded-full border-4 flex items-center justify-center mx-auto mb-5">
+
+            <i id="guard-message-icon"
+               class="fa-solid fa-check text-4xl"></i>
+
+        </div>
+
+
+        <h3 id="guard-message-title"
+            class="text-2xl font-black text-slate-700 mb-2">
+
+            Mensaje
+
+        </h3>
+
+
+        <p id="guard-message-text"
+           class="text-sm text-slate-400 mb-7">
+
+            Operación realizada.
+
+        </p>
+
+
+        <button id="btn-ok-guard-message"
+                class="px-10 py-2.5 rounded-xl text-sm font-black shadow-sm">
+
+            OK
+
+        </button>
+
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+<script>
+
+// =========================================================
+// GENERALES
+// =========================================================
+
+function getCookie(name) {
+    let valor = null;
+
+    if (document.cookie && document.cookie !== "") {
+        for (let cookie of document.cookie.split(";")) {
+            cookie = cookie.trim();
+
+            if (cookie.startsWith(name + "=")) {
+                valor = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+
+    return valor;
+}
+
+
+function closeModal(tipo) {
+    const modal = document.getElementById("modal-" + tipo);
+    if (!modal) return;
+
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+}
+
+
+function abrirModal(id) {
+    const modal = document.getElementById(id);
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+
+function mostrarCargandoGuarda(texto) {
+    document.getElementById("guard-loading-title").innerText = texto;
+    abrirModal("modal-guard-loading");
+}
+
+
+function ocultarCargandoGuarda() {
+    closeModal("guard-loading");
+}
+
+
+
+// =========================================================
+// FOTO
+// =========================================================
+
+function mostrarFoto(url) {
+
+    const preview = document.getElementById("guard-foto-preview");
+    const placeholder = document.getElementById("guard-foto-placeholder");
+
+    if (url) {
+
+        preview.src = url;
+        preview.classList.remove("hidden");
+        placeholder.classList.add("hidden");
+
+    } else {
+
+        preview.src = "";
+        preview.classList.add("hidden");
+        placeholder.classList.remove("hidden");
+
+    }
+}
+
+
+function previsualizarFoto(event) {
+
+    const archivo = event.target.files[0];
+
+    if (!archivo) return;
+
+    const reader = new FileReader();
+
+    reader.onload = e => {
+
+        mostrarFoto(e.target.result);
+
+        document.getElementById("btn-quitar-foto-preview").classList.remove("hidden");
+
+    };
+
+    reader.readAsDataURL(archivo);
+}
+
+
+function quitarFotoPreview() {
+
+    document.getElementById("guard-foto").value = "";
+
+    mostrarFoto("");
+
+    document.getElementById("btn-quitar-foto-preview").classList.add("hidden");
+}
+
+
+
+// =========================================================
+// MENSAJES
+// =========================================================
+
+function mostrarModalGuarda(titulo, mensaje, tipo = "success", recargar = false) {
+
+    const caja = document.getElementById("guard-message-icon-box");
+    const icono = document.getElementById("guard-message-icon");
+    const boton = document.getElementById("btn-ok-guard-message");
+
+    document.getElementById("guard-message-title").innerText = titulo;
+    document.getElementById("guard-message-text").innerText = mensaje;
+
+
+    if (tipo === "success") {
+
+        caja.className = "w-20 h-20 rounded-full border-4 border-emerald-100 flex items-center justify-center mx-auto mb-5";
+
+        icono.className = "fa-solid fa-check text-4xl text-emerald-500";
+
+        boton.className = "bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-10 py-2.5 rounded-xl text-sm font-black shadow-sm cursor-pointer";
+
+    } else {
+
+        caja.className = "w-20 h-20 rounded-full border-4 border-red-100 flex items-center justify-center mx-auto mb-5";
+
+        icono.className = "fa-solid fa-xmark text-4xl text-red-500";
+
+        boton.className = "bg-red-500 hover:bg-red-600 text-white px-10 py-2.5 rounded-xl text-sm font-black shadow-sm cursor-pointer";
+
+    }
+
+
+    abrirModal("modal-guard-message");
+
+
+    boton.onclick = () => {
+
+        closeModal("guard-message");
+
+        if (recargar) location.reload();
+
+    };
+}
+
+
+
+// =========================================================
+// CREAR / EDITAR
+// =========================================================
+
+function openGuardModal(mode, codigo = null) {
+
+    const form = document.getElementById("form-guard-data");
+    const codigoInput = document.getElementById("guard-codigo");
+
+    form.reset();
+
+    mostrarFoto("");
+
+    document.getElementById("btn-quitar-foto-preview").classList.add("hidden");
+
+
+    if (mode === "create") {
+
+        document.getElementById("guard-modal-title").innerText = "Nuevo Guarda";
+
+        document.getElementById("guard-modal-subtitle").innerText = "Información del personal de seguridad";
+
+        codigoInput.disabled = false;
+
+        document.getElementById("aviso-credenciales").classList.remove("hidden");
+
+    } else {
+
+        const row = document.getElementById(`guard-row-${codigo}`);
+
+        if (!row) return;
+
+
+        document.getElementById("guard-modal-title").innerText = "Editar Guarda";
+
+        document.getElementById("guard-modal-subtitle").innerText = `Usuario: ${row.dataset.usuario}`;
+
+
+        codigoInput.value = row.dataset.codigo;
+
+        codigoInput.disabled = true;
+
+
+        document.getElementById("guard-nombre").value = row.dataset.nombre;
+
+        document.getElementById("guard-apellido").value = row.dataset.apellido;
+
+        document.getElementById("guard-sexo").value = row.dataset.sexo;
+
+        document.getElementById("guard-turno").value = row.dataset.turno;
+
+
+        mostrarFoto(row.dataset.foto);
+
+
+        document.getElementById("aviso-credenciales").classList.add("hidden");
+
+    }
+
+
+    abrirModal("modal-guard-form");
+}
+
+
+
+// =========================================================
+// GUARDAR
+// =========================================================
+
+function saveGuard(event) {
+
+    event.preventDefault();
+
+
+    const codigo = document.getElementById("guard-codigo");
+
+    const editando = codigo.disabled;
+
+    const foto = document.getElementById("guard-foto").files[0];
+
+
+    const data = new FormData();
+
+
+    data.append("codigo_unico", codigo.value.trim());
+
+    data.append("nombre", document.getElementById("guard-nombre").value.trim());
+
+    data.append("apellido", document.getElementById("guard-apellido").value.trim());
+
+    data.append("sexo", document.getElementById("guard-sexo").value);
+
+    data.append("turno", document.getElementById("guard-turno").value);
+
+
+    if (foto) data.append("foto", foto);
+
+
+    const url = editando
+        ? "/actualizar-guarda-seguridad/"
+        : "/crear-guarda-seguridad/";
+
+
+    closeModal("guard-form");
+
+    mostrarCargandoGuarda("Guardando información...");
+
+
+    fetch(url, {
+
+        method: "POST",
+
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+
+        body: data
+
+    })
+
+    .then(res => res.json())
+
+    .then(res => {
+
+        ocultarCargandoGuarda();
+
+
+        if (res.mensaje !== "ok") {
+
+            mostrarModalGuarda(
+                "No se pudo guardar",
+                res.detalle || "Ocurrió un error.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        if (!editando) {
+
+            mostrarCredenciales(
+                res.usuario,
+                res.contrasena
+            );
+
+            return;
+        }
+
+
+        mostrarModalGuarda(
+            "Guardado correctamente",
+            "La información del guarda fue actualizada correctamente.",
+            "success",
+            true
+        );
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
+        ocultarCargandoGuarda();
+
+        mostrarModalGuarda(
+            "Error de conexión",
+            "No se pudo conectar con el servidor.",
+            "error"
+        );
+
+    });
+}
+
+
+
+// =========================================================
+// CREDENCIALES
+// =========================================================
+
+function mostrarCredenciales(usuario, contrasena) {
+
+    document.getElementById("credencial-usuario").innerText = usuario;
+
+    document.getElementById("credencial-password").innerText = contrasena;
+
+    document.getElementById("mensaje-copiado").classList.add("hidden");
+
+    abrirModal("modal-credenciales");
+}
+
+
+async function copiarTexto(texto) {
+
+    try {
+
+        await navigator.clipboard.writeText(texto);
+
+        mostrarCopiado();
+
+    } catch {
+
+        mostrarModalGuarda(
+            "No se pudo copiar",
+            "Copie las credenciales manualmente.",
+            "error"
+        );
+
+    }
+}
+
+
+function copiarUsuario() {
+
+    copiarTexto(
+        document.getElementById("credencial-usuario").innerText
+    );
+}
+
+
+function copiarPassword() {
+
+    copiarTexto(
+        document.getElementById("credencial-password").innerText
+    );
+}
+
+
+function copiarCredenciales() {
+
+    const usuario =
+        document.getElementById("credencial-usuario").innerText;
+
+    const password =
+        document.getElementById("credencial-password").innerText;
+
+
+    copiarTexto(
+        `Usuario: ${usuario}\nContraseña: ${password}`
+    );
+}
+
+
+function mostrarCopiado() {
+
+    const mensaje =
+        document.getElementById("mensaje-copiado");
+
+
+    mensaje.classList.remove("hidden");
+
+
+    setTimeout(
+        () => mensaje.classList.add("hidden"),
+        2000
+    );
+}
+
+
+function cerrarCredenciales() {
+
+    closeModal("credenciales");
+
+    location.reload();
+}
+
+
+
+// =========================================================
+// CONTRASEÑA
+// =========================================================
+
+function openGuardPasswordModal(codigo) {
+
+    const row =
+        document.getElementById(`guard-row-${codigo}`);
+
+
+    if (!row) return;
+
+
+    document.getElementById("guard-password-codigo").value =
+        codigo;
+
+
+    document.getElementById("guard-password-user").innerText =
+        row.dataset.usuario;
+
+
+    document.getElementById("guard-new-password").value = "";
+
+
+    abrirModal("modal-guard-password");
+}
+
+
+function executeGuardPasswordReset() {
+
+    const codigo =
+        document.getElementById("guard-password-codigo").value;
+
+
+    const contrasena =
+        document.getElementById("guard-new-password").value.trim();
+
+
+    if (!contrasena) {
+
+        mostrarModalGuarda(
+            "Contraseña requerida",
+            "Debe ingresar una nueva contraseña.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const data = new FormData();
+
+
+    data.append("codigo_unico", codigo);
+
+    data.append("contrasena", contrasena);
+
+
+    closeModal("guard-password");
+
+    mostrarCargandoGuarda(
+        "Actualizando contraseña..."
+    );
+
+
+    fetch("/actualizar-password-guarda/", {
+
+        method: "POST",
+
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+
+        body: data
+
+    })
+
+    .then(res => res.json())
+
+    .then(res => {
+
+        ocultarCargandoGuarda();
+
+
+        if (res.mensaje === "ok") {
+
+            mostrarModalGuarda(
+                "Clave actualizada",
+                "La contraseña fue actualizada correctamente.",
+                "success"
+            );
+
+        } else {
+
+            mostrarModalGuarda(
+                "No se pudo actualizar",
+                res.detalle || "Ocurrió un error.",
+                "error"
+            );
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
+        ocultarCargandoGuarda();
+
+        mostrarModalGuarda(
+            "Error de conexión",
+            "No se pudo conectar con el servidor.",
+            "error"
+        );
+
+    });
+}
+
+
+
+// =========================================================
+// ELIMINAR
+// =========================================================
+
+function openDeleteGuardModal(codigo) {
+
+    const row =
+        document.getElementById(`guard-row-${codigo}`);
+
+
+    if (!row) return;
+
+
+    document.getElementById("delete-guard-codigo").value =
+        codigo;
+
+
+    document.getElementById("delete-guard-name").innerText =
+        `${row.dataset.nombre} ${row.dataset.apellido}`.trim();
+
+
+    abrirModal("modal-delete-guard");
+}
+
+
+function executeDeleteGuard() {
+
+    const data = new FormData();
+
+
+    data.append(
+        "codigo_unico",
+        document.getElementById("delete-guard-codigo").value
+    );
+
+
+    closeModal("delete-guard");
+
+
+    mostrarCargandoGuarda(
+        "Eliminando personal..."
+    );
+
+
+    fetch("/eliminar-guarda-seguridad/", {
+
+        method: "POST",
+
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+
+        body: data
+
+    })
+
+    .then(res => res.json())
+
+    .then(res => {
+
+        ocultarCargandoGuarda();
+
+
+        if (res.mensaje === "ok") {
+
+            mostrarModalGuarda(
+                "Guarda eliminado",
+                "El personal de seguridad fue eliminado correctamente.",
+                "success",
+                true
+            );
+
+        } else {
+
+            mostrarModalGuarda(
+                "No se pudo eliminar",
+                res.detalle || "Ocurrió un error.",
+                "error"
+            );
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
+        ocultarCargandoGuarda();
+
+        mostrarModalGuarda(
+            "Error de conexión",
+            "No se pudo conectar con el servidor.",
+            "error"
+        );
+
+    });
+}
+
+
+
+// =========================================================
+// BUSCADOR
+// =========================================================
+
+function filtrarGuardas() {
+
+    const texto =
+        document.getElementById("buscar-guarda").value.toLowerCase().trim();
+
+
+    const filas =
+        document.querySelectorAll(".guard-row");
+
+
+    let visibles = 0;
+
+
+    filas.forEach(fila => {
+
+        const datos =
+            `${fila.dataset.codigo} ${fila.dataset.nombre} ${fila.dataset.apellido} ${fila.dataset.usuario} ${fila.dataset.turno} ${fila.dataset.sexo}`.toLowerCase();
+
+
+        if (datos.includes(texto)) {
+
+            fila.classList.remove("hidden");
+
+            visibles++;
+
+        } else {
+
+            fila.classList.add("hidden");
+
+        }
+
+    });
+
+
+    document.getElementById("contador-guardas").innerText =
+        visibles === 1
+            ? "1 guarda"
+            : `${visibles} guardas`;
+}
+
+
+
+// =========================================================
+// CERRAR AL TOCAR EL FONDO
+// =========================================================
+
+document.addEventListener("click", event => {
+
+    [
+        "modal-guard-form",
+        "modal-guard-password",
+        "modal-delete-guard"
+    ].forEach(id => {
+
+        const modal =
+            document.getElementById(id);
+
+
+        if (event.target === modal) {
+
+            modal.classList.add("hidden");
+
+            modal.classList.remove("flex");
+
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,607 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- ===================================================== -->
+<!-- CABECERA DEL PANEL GENERAL -->
+<!-- ===================================================== -->
+
+<header class="bg-white shadow-sm px-8 py-4 flex flex-col md:flex-row
+               justify-between items-start md:items-center gap-4
+               border-b border-gray-200">
+
+    <div>
+        <h1 class="text-2xl font-extrabold text-gray-800 tracking-tight uppercase">
+            Panel Administrativo
+        </h1>
+
+        <p class="text-sm font-semibold text-[#053e2e]">
+            Comedor universitario e internado
+        </p>
+    </div>
+
+    <div class="flex items-center gap-3">
+
+        <div class="bg-gray-50 border border-gray-200 rounded-xl
+                    px-4 py-2 text-sm text-gray-600">
+
+            <i class="fa-solid fa-calendar-days mr-2 text-[#053e2e]"></i>
+
+            Hoy:
+            <span class="font-bold text-gray-800">
+                {{ hoy|date:"d/m/Y" }}
+            </span>
+        </div>
+
+        <a href="."
+           class="bg-[#053e2e] text-white px-4 py-2 rounded-lg
+                  text-xs font-bold hover:bg-[#043326] transition">
+
+            <i class="fa-solid fa-rotate-right mr-2"></i>
+            Actualizar
+        </a>
+
+    </div>
+
+</header>
+
+
+<!-- ===================================================== -->
+<!-- TARJETAS PRINCIPALES -->
+<!-- ===================================================== -->
+
+<section class="px-8 pt-6 pb-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+    <!-- Total estudiantes -->
+
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm
+                flex items-center gap-4">
+
+        <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-600
+                    flex items-center justify-center text-2xl">
+
+            <i class="fa-solid fa-users"></i>
+        </div>
+
+        <div>
+            <p class="text-xs font-bold text-gray-400 uppercase">
+                Total estudiantes
+            </p>
+
+            <h3 class="text-2xl font-black text-blue-600">
+                {{ total_estudiantes }}
+            </h3>
+
+            <p class="text-xs text-gray-400">
+                Registrados en el sistema
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Asistencias comedor -->
+
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm
+                flex items-center gap-4">
+
+        <div class="w-14 h-14 rounded-full bg-orange-50 text-orange-500
+                    flex items-center justify-center text-2xl">
+
+            <i class="fa-solid fa-utensils"></i>
+        </div>
+
+        <div>
+            <p class="text-xs font-bold text-gray-400 uppercase">
+                Asistencias hoy
+            </p>
+
+            <h3 class="text-2xl font-black text-orange-500">
+                {{ asistencias_hoy }}
+            </h3>
+
+            <p class="text-xs text-gray-400">
+                Comedor universitario
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Estudiantes dentro -->
+
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm
+                flex items-center gap-4">
+
+        <div class="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600
+                    flex items-center justify-center text-2xl">
+
+            <i class="fa-solid fa-door-closed"></i>
+        </div>
+
+        <div>
+            <p class="text-xs font-bold text-gray-400 uppercase">
+                Dentro del internado
+            </p>
+
+            <h3 class="text-2xl font-black text-emerald-600">
+                {{ estudiantes_dentro }}
+            </h3>
+
+            <p class="text-xs text-gray-400">
+                Actualmente dentro
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Estudiantes fuera -->
+
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm
+                flex items-center gap-4">
+
+        <div class="w-14 h-14 rounded-full bg-red-50 text-red-500
+                    flex items-center justify-center text-2xl">
+
+            <i class="fa-solid fa-person-walking-arrow-right"></i>
+        </div>
+
+        <div>
+            <p class="text-xs font-bold text-gray-400 uppercase">
+                Fuera del internado
+            </p>
+
+            <h3 class="text-2xl font-black text-red-500">
+                {{ estudiantes_fuera }}
+            </h3>
+
+            <p class="text-xs text-gray-400">
+                Actualmente fuera
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- RESUMEN COMEDOR E INTERNADO -->
+<!-- ===================================================== -->
+
+<section class="px-8 py-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Resumen comedor -->
+
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+
+        <h4 class="font-bold text-gray-700 uppercase text-sm mb-5">
+            Resumen comedor - hoy
+        </h4>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+
+            <div style="height: 230px;">
+                <canvas id="chartComedor"></canvas>
+            </div>
+
+            <div class="space-y-3">
+
+                <div class="flex items-center justify-between
+                            bg-blue-50 rounded-xl px-4 py-3">
+
+                    <div class="flex items-center gap-3">
+                        <div class="text-blue-600">
+                            <i class="fa-solid fa-mug-saucer"></i>
+                        </div>
+
+                        <span class="text-sm font-semibold text-gray-700">
+                            Desayunos
+                        </span>
+                    </div>
+
+                    <span class="font-black text-blue-600">
+                        {{ desayunos_servidos }}
+                    </span>
+                </div>
+
+
+                <div class="flex items-center justify-between
+                            bg-orange-50 rounded-xl px-4 py-3">
+
+                    <div class="flex items-center gap-3">
+                        <div class="text-orange-500">
+                            <i class="fa-solid fa-bowl-food"></i>
+                        </div>
+
+                        <span class="text-sm font-semibold text-gray-700">
+                            Almuerzos
+                        </span>
+                    </div>
+
+                    <span class="font-black text-orange-500">
+                        {{ almuerzos_servidos }}
+                    </span>
+                </div>
+
+
+                <div class="flex items-center justify-between
+                            bg-purple-50 rounded-xl px-4 py-3">
+
+                    <div class="flex items-center gap-3">
+                        <div class="text-purple-600">
+                            <i class="fa-solid fa-moon"></i>
+                        </div>
+
+                        <span class="text-sm font-semibold text-gray-700">
+                            Cenas
+                        </span>
+                    </div>
+
+                    <span class="font-black text-purple-600">
+                        {{ cenas_servidas }}
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Resumen internado -->
+
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+
+        <h4 class="font-bold text-gray-700 uppercase text-sm mb-5">
+            Resumen internado - hoy
+        </h4>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+
+            <div class="space-y-3">
+
+                <div class="flex items-center justify-between
+                            bg-red-50 rounded-xl px-4 py-3">
+
+                    <div class="flex items-center gap-3">
+                        <div class="text-red-500">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </div>
+
+                        <span class="text-sm font-semibold text-gray-700">
+                            Salidas de hoy
+                        </span>
+                    </div>
+
+                    <span class="font-black text-red-500">
+                        {{ salidas_hoy }}
+                    </span>
+                </div>
+
+
+                <div class="flex items-center justify-between
+                            bg-emerald-50 rounded-xl px-4 py-3">
+
+                    <div class="flex items-center gap-3">
+                        <div class="text-emerald-600">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                        </div>
+
+                        <span class="text-sm font-semibold text-gray-700">
+                            Entradas de hoy
+                        </span>
+                    </div>
+
+                    <span class="font-black text-emerald-600">
+                        {{ entradas_hoy }}
+                    </span>
+                </div>
+
+
+                <div class="flex items-center justify-between
+                            bg-purple-50 rounded-xl px-4 py-3">
+
+                    <div class="flex items-center gap-3">
+                        <div class="text-purple-600">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+
+                        <span class="text-sm font-semibold text-gray-700">
+                            No han regresado
+                        </span>
+                    </div>
+
+                    <span class="font-black text-purple-600">
+                        {{ no_han_regresado }}
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div style="height: 230px;">
+                <canvas id="chartInternado"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- ÚLTIMOS MOVIMIENTOS DEL INTERNADO -->
+<!-- ===================================================== -->
+
+<section class="px-8 pb-8">
+
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+
+        <div class="flex justify-between items-center mb-4">
+
+            <h4 class="font-bold text-gray-700 uppercase text-sm">
+
+                <i class="fa-solid fa-circle text-emerald-500
+                          animate-pulse mr-2"></i>
+
+                Últimos movimientos del internado
+            </h4>
+
+        </div>
+
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full text-left text-sm">
+
+                <thead class="bg-gray-50 text-gray-500 uppercase
+                              text-xs font-bold">
+
+                    <tr>
+                        <th class="py-3 px-4">Carnet</th>
+                        <th class="py-3 px-4">Estudiante</th>
+                        <th class="py-3 px-4">Tipo</th>
+                        <th class="py-3 px-4">Fecha</th>
+                        <th class="py-3 px-4">Hora</th>
+                        <th class="py-3 px-4">Estado</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody class="divide-y divide-gray-100 font-medium">
+
+                    {% for movimiento in ultimos_movimientos %}
+
+                    <tr class="hover:bg-gray-50">
+
+                        <td class="py-3 px-4 text-xs font-mono">
+                            {{ movimiento.carnet }}
+                        </td>
+
+                        <td class="py-3 px-4">
+                            {{ movimiento.estudiante }}
+                        </td>
+
+                        <td class="py-3 px-4">
+
+                            {% if movimiento.tipo == "Salida" %}
+
+                                <span class="text-red-500 font-bold">
+                                    <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i>
+                                    Salida
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-emerald-600 font-bold">
+                                    <i class="fa-solid fa-arrow-right-to-bracket mr-1"></i>
+                                    Entrada
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td class="py-3 px-4">
+                            {{ movimiento.fecha|date:"d/m/Y" }}
+                        </td>
+
+                        <td class="py-3 px-4">
+                            {{ movimiento.hora|time:"h:i A" }}
+                        </td>
+
+                        <td class="py-3 px-4">
+
+                            {% if movimiento.estado == "DENTRO" %}
+
+                                <span class="bg-emerald-100 text-emerald-700
+                                             px-3 py-1 rounded-lg text-xs font-bold">
+                                    DENTRO
+                                </span>
+
+                            {% else %}
+
+                                <span class="bg-orange-100 text-orange-600
+                                             px-3 py-1 rounded-lg text-xs font-bold">
+                                    FUERA
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="6"
+                            class="py-6 text-center text-gray-400 text-xs">
+
+                            No hay movimientos registrados.
+
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        Chart.register(ChartDataLabels);
+
+
+        // =================================================
+        // GRÁFICA DEL COMEDOR
+        // =================================================
+
+        new Chart(
+            document.getElementById("chartComedor").getContext("2d"),
+            {
+                type: "doughnut",
+
+                data: {
+                    labels: [
+                        "Desayunos",
+                        "Almuerzos",
+                        "Cenas"
+                    ],
+
+                    datasets: [{
+                        data: [
+                            {{ desayunos_servidos|default:0 }},
+                            {{ almuerzos_servidos|default:0 }},
+                            {{ cenas_servidas|default:0 }}
+                        ],
+
+                        backgroundColor: [
+                            "#2563EB",
+                            "#F97316",
+                            "#9333EA"
+                        ],
+
+                        borderWidth: 0
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: "65%",
+
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+
+                        datalabels: {
+                            color: "#ffffff",
+
+                            font: {
+                                weight: "bold",
+                                size: 12
+                            },
+
+                            formatter: function (value) {
+                                return value > 0 ? value : "";
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+
+        // =================================================
+        // GRÁFICA DEL INTERNADO
+        // =================================================
+
+        new Chart(
+            document.getElementById("chartInternado").getContext("2d"),
+            {
+                type: "doughnut",
+
+                data: {
+                    labels: [
+                        "Dentro",
+                        "Fuera"
+                    ],
+
+                    datasets: [{
+                        data: [
+                            {{ estudiantes_dentro|default:0 }},
+                            {{ estudiantes_fuera|default:0 }}
+                        ],
+
+                        backgroundColor: [
+                            "#059669",
+                            "#EF4444"
+                        ],
+
+                        borderWidth: 0
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: "65%",
+
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+
+                            labels: {
+                                boxWidth: 12,
+
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+
+                        datalabels: {
+                            color: "#ffffff",
+
+                            font: {
+                                weight: "bold",
+                                size: 12
+                            },
+
+                            formatter: function (value) {
+                                return value > 0 ? value : "";
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+    });
+
+</script>
+
+{% endblock %}

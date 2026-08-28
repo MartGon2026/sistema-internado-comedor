@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta de Seguridad - BICU</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body { font-family: 'Inter', sans-serif; background: #f4f6f8; margin: 0; padding: 20px; color: #333; }
+        .encuesta { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        
+        .progress-bar { height: 6px; background: #e5e7eb; border-radius: 3px; margin-bottom: 25px; }
+        .progress-fill { height: 100%; background: #064e3b; width: 25%; transition: width 0.3s; border-radius: 3px; }
+
+        .paso { display: none; }
+        .paso.activo { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        h2 { color: #064e3b; font-size: 1.2rem; margin-bottom: 20px; }
+        .pregunta { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; }
+        .pregunta p { font-weight: 600; margin-bottom: 10px; font-size: 0.95rem; }
+        
+        .opciones label { display: block; padding: 10px; margin: 6px 0; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+        .opciones label:hover { background: #f9fafb; border-color: #064e3b; }
+
+        .datos select, .datos input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        
+        .botones { display: flex; gap: 10px; margin-top: 20px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-sig { background: #064e3b; color: white; }
+        .btn-ant { background: #e5e7eb; color: #374151; }
+    </style>
+</head>
+<body>
+
+<div class="encuesta">
+    <div class="progress-bar"><div id="progreso" class="progress-fill"></div></div>
+
+    <form id="formEncuesta">
+        <!-- PASO 1: Datos -->
+        <div class="paso activo" id="paso1">
+            <h2>Datos Generales</h2>
+            <div class="datos">
+                <label>Tipo de participante</label>
+                <select required>
+                    <option value="">Seleccione...</option>
+                    <option>Personal de TI</option>
+                    <option>Docente</option>
+                    <option>Encargado de laboratorio</option>
+                    <option>Personal administrativo</option>
+                    <option>Estudiante</option>
+                </select>
+                <label>Área o dependencia</label>
+                <input type="text" placeholder="Ej: Laboratorio, Administración">
+            </div>
+            <button type="button" class="btn-sig" onclick="siguiente(1)">Siguiente</button>
+        </div>
+
+        <!-- PASO 2: Preguntas 1-4 -->
+        <div class="paso" id="paso2">
+            <h2>Seguridad (Parte 1)</h2>
+            <!-- P1 -->
+            <div class="pregunta">
+                <p>1. ¿Se restringe la instalación de software no autorizado?</p>
+                <div class="opciones">
+                    <label><input type="radio" name="p1"> Sí</label>
+                    <label><input type="radio" name="p1"> No</label>
+                    <label><input type="radio" name="p1"> Parcialmente</label>
+                    <label><input type="radio" name="p1"> No sabe</label>
+                </div>
+            </div>
+            <!-- P2 -->
+            <div class="pregunta">
+                <p>2. ¿Los usuarios tienen permisos adecuados según su rol?</p>
+                <div class="opciones">
+                    <label><input type="radio" name="p2"> Sí</label>
+                    <label><input type="radio" name="p2"> No</label>
+                    <label><input type="radio" name="p2"> Parcialmente</label>
+                    <label><input type="radio" name="p2"> No sabe</label>
+                </div>
+            </div>
+            <!-- P3 -->
+            <div class="pregunta">
+                <p>3. ¿Ha observado instalación de programas no autorizados?</p>
+                <div class="opciones">
+                    <label><input type="radio" name="p3"> Frecuentemente</label>
+                    <label><input type="radio" name="p3"> Algunas veces</label>
+                    <label><input type="radio" name="p3"> Nunca</label>
+                    <label><input type="radio" name="p3"> No sabe</label>
+                </div>
+            </div>
+            <!-- P4 -->
+            <div class="pregunta">
+                <p>4. ¿Existe control sobre el uso de memorias USB u otros dispositivos?</p>
+                <div class="opciones">
+                    <label><input type="radio" name="p4"> Sí</label>
+                    <label><input type="radio" name="p4"> No</label>
+                    <label><input type="radio" name="p4"> Parcialmente</label>
+                    <label><input type="radio" name="p4"> No sabe</label>
+                </div>
+            </div>
+            <div class="botones">
+                <button type="button" class="btn-ant" onclick="anterior(2)">Atrás</button>
+                <button type="button" class="btn-sig" onclick="siguiente(2)">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- PASO 3: Preguntas 5-8 -->
+        <div class="paso" id="paso3">
+            <h2>Seguridad (Parte 2)</h2>
+            <!-- P5 -->
+            <div class="pregunta">
+                <p>5. ¿Los equipos cuentan con antivirus actualizado?</p>
+                <div class="opciones">
+                    <label><input type="radio" name="p5"> Sí</label>
+                    <label><input type="radio" name="p5"> No</label>
+                    <label><input type="radio" name="p5"> Parcialmente</label>
+                    <label><input type="radio" name="p5"> No sabe</label>
+                </div>
+            </div>
+            <!-- P6 -->
+            <div class="pregunta">
+                <p>6. ¿Se realiza mantenimiento preventivo periódico?</p>
+                <div class="opciones">
+                    <label><input type="radio" name="p6"> Sí</label>
+                    <label><input type="radio" name="p6"> No</label>
+                    <label><input type="radio" name="p6"> A veces</label>
+                    <label><input type="radio" name="p6"> No sabe</label>
+                </div>
+            </div>
+            <!-- P7 -->
+            <div class="pregunta">
+                <p>7. ¿Se reportan los incidentes de seguridad o fallas?</p>
+                <div class="opciones">
+                    <label><input type="radio" name="p7"> Sí</label>
+                    <label><input type="radio" name="p7"> No</label>
+                    <label><input type="radio" name="p7"> A veces</label>
+                    <label><input type="radio" name="p7"> No sabe</label>
+                </div>
+            </div>
+            <!-- P8 -->
+            <div class="pregunta">
+                <p>8. ¿Considera necesario fortalecer las políticas de seguridad?</p>
+                <div class="opciones">
+                    <label><input type="radio" name="p8"> Totalmente necesario</label>
+                    <label><input type="radio" name="p8"> Necesario</label>
+                    <label><input type="radio" name="p8"> Poco necesario</label>
+                    <label><input type="radio" name="p8"> No necesario</label>
+                </div>
+            </div>
+            <div class="botones">
+                <button type="button" class="btn-ant" onclick="anterior(3)">Atrás</button>
+                <button type="button" class="btn-sig" onclick="siguiente(3)">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- PASO 4: Observaciones -->
+        <div class="paso" id="paso4">
+            <h2>Comentarios Finales</h2>
+            <label>Observaciones adicionales</label>
+            <textarea placeholder="Escriba aquí sus comentarios..."></textarea>
+            <div class="botones">
+                <button type="button" class="btn-ant" onclick="anterior(4)">Atrás</button>
+                <button type="submit" class="btn-sig" style="background:#059669;">Enviar encuesta</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function siguiente(pasoActual) {
+        document.getElementById('paso' + pasoActual).classList.remove('activo');
+        document.getElementById('paso' + (pasoActual + 1)).classList.add('activo');
+        document.getElementById('progreso').style.width = ((pasoActual) * 25) + '%';
+    }
+    function anterior(pasoActual) {
+        document.getElementById('paso' + pasoActual).classList.remove('activo');
+        document.getElementById('paso' + (pasoActual - 1)).classList.add('activo');
+        document.getElementById('progreso').style.width = ((pasoActual - 2) * 25) + '%';
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,1286 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="h-screen flex flex-col overflow-hidden bg-slate-50">
+
+    <!-- ====================================================== -->
+    <!-- CABECERA -->
+    <!-- ====================================================== -->
+
+    <header class="bg-white px-8 py-6 border-b border-gray-100 shrink-0">
+
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+
+            <div>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tight">
+                    Control de Usuarios
+                </h1>
+
+                <p class="text-sm text-slate-500 mt-1">
+                    Gestión de cuentas de estudiantes
+                </p>
+            </div>
+
+            <button onclick="openUserModal('create')"
+                    class="flex items-center justify-center gap-2 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-5 py-3 rounded-xl text-sm font-bold transition shadow-sm cursor-pointer">
+
+                <i class="fa-solid fa-plus"></i>
+                Nuevo Usuario
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- ====================================================== -->
+    <!-- CONTENIDO -->
+    <!-- ====================================================== -->
+
+    <section class="p-8 flex-1 min-h-0 overflow-hidden">
+
+        <div class="bg-white border border-slate-100 rounded-2xl shadow-sm h-full flex flex-col overflow-hidden">
+
+
+            <!-- ================================================== -->
+            <!-- BUSCADOR + TOTAL -->
+            <!-- ================================================== -->
+
+            <div class="p-4 border-b border-slate-100 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+
+                <!-- BUSCADOR -->
+
+                <div class="relative w-full max-w-md">
+
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+
+                    <input id="buscar-usuario"
+                           type="text"
+                           oninput="filtrarUsuarios()"
+                           placeholder="Buscar por carnet o usuario..."
+                           class="w-full border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF]">
+
+                </div>
+
+
+                <!-- TOTAL USUARIOS -->
+
+                <div class="flex items-center gap-3 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl shrink-0">
+
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-[#1E40AF] flex items-center justify-center">
+                        <i class="fa-solid fa-users text-xs"></i>
+                    </div>
+
+                    <div>
+
+                        <p id="contador-usuarios" class="text-sm font-black text-slate-700">
+                            {{ total_usuarios }} usuarios
+                        </p>
+
+                        <p class="text-[10px] text-slate-400">
+                            Cuentas registradas
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================== -->
+            <!-- TABLA -->
+            <!-- ================================================== -->
+
+            <div class="flex-1 min-h-0 overflow-auto">
+
+                <table class="w-full text-left">
+
+
+                    <!-- ENCABEZADO FIJO -->
+
+                    <thead class="sticky top-0 z-20 bg-[#1E3A8A] text-white uppercase text-[11px] font-black shadow-sm">
+
+                        <tr>
+
+                            <th class="px-6 py-4 bg-[#1E3A8A]">
+                                Carnet
+                            </th>
+
+                            <th class="px-6 py-4 bg-[#1E3A8A]">
+                                Usuario
+                            </th>
+
+                            <th class="px-6 py-4 bg-[#1E3A8A]">
+                                Estado
+                            </th>
+
+                            <th class="px-6 py-4 bg-[#1E3A8A]">
+                                Sesión Activa
+                            </th>
+
+                            <th class="px-6 py-4 text-center bg-[#1E3A8A]">
+                                Operaciones
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <!-- LISTA -->
+
+                    <tbody id="tabla-usuarios-body" class="divide-y divide-slate-100">
+
+                        {% for u in usuarios %}
+
+                        <tr id="user-row-{{ u.id }}"
+                            class="user-row hover:bg-blue-50/30 transition"
+                            data-id="{{ u.id }}"
+                            data-carnet="{% if u.carnet %}{{ u.carnet.carnet }}{% endif %}"
+                            data-usuario="{{ u.usuario }}"
+                            data-estado="{% if u.estado %}true{% else %}false{% endif %}"
+                            data-sesion="{% if u.sesion_activa %}true{% else %}false{% endif %}">
+
+
+                            <!-- CARNET -->
+
+                            <td class="px-6 py-4">
+
+                                {% if u.carnet %}
+
+                                    <span class="font-mono text-xs font-bold text-slate-600">
+                                        {{ u.carnet.carnet }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-xs text-slate-300">—</span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- USUARIO -->
+
+                            <td class="px-6 py-4">
+
+                                <div class="flex items-center gap-3">
+
+                                    <div class="w-9 h-9 rounded-full bg-blue-100 text-[#1E40AF] flex items-center justify-center text-xs font-black shrink-0">
+                                        {{ u.usuario|slice:":1"|upper }}
+                                    </div>
+
+                                    <p class="text-sm font-bold text-slate-700">
+                                        {{ u.usuario }}
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- ESTADO -->
+
+                            <td class="px-6 py-4">
+
+                                {% if u.estado %}
+
+                                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black">
+
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        ACTIVO
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-500 text-[10px] font-black">
+
+                                        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                        INACTIVO
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- SESIÓN -->
+
+                            <td class="px-6 py-4">
+
+                                {% if u.sesion_activa %}
+
+                                    <span class="inline-flex items-center gap-2 text-xs font-semibold text-emerald-600">
+
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                        En línea
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="inline-flex items-center gap-2 text-xs font-medium text-slate-400">
+
+                                        <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+                                        Desconectado
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- OPERACIONES -->
+
+                            <td class="px-6 py-4">
+
+                                <div class="flex justify-center gap-2">
+
+                                    <!-- EDITAR -->
+
+                                    <button onclick="openUserModal('update', '{{ u.id }}')"
+                                            title="Editar usuario"
+                                            class="w-9 h-9 rounded-lg border border-blue-100 bg-blue-50 text-blue-600 hover:bg-blue-100 transition cursor-pointer">
+
+                                        <i class="fa-solid fa-pen"></i>
+
+                                    </button>
+
+
+                                    <!-- CONTRASEÑA -->
+
+                                    <button onclick="openResetPasswordModal('{{ u.id }}')"
+                                            title="Cambiar contraseña"
+                                            class="w-9 h-9 rounded-lg border border-amber-100 bg-amber-50 text-amber-500 hover:bg-amber-100 transition cursor-pointer">
+
+                                        <i class="fa-solid fa-key"></i>
+
+                                    </button>
+
+
+                                    <!-- ELIMINAR -->
+
+                                    <button onclick="openDeleteUserModal('{{ u.id }}')"
+                                            title="Eliminar usuario"
+                                            class="w-9 h-9 rounded-lg border border-red-100 bg-red-50 text-red-500 hover:bg-red-100 transition cursor-pointer">
+
+                                        <i class="fa-solid fa-trash-can"></i>
+
+                                    </button>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td colspan="5" class="py-14 text-center">
+
+                                <div class="text-slate-300 text-3xl mb-3">
+                                    <i class="fa-solid fa-users-slash"></i>
+                                </div>
+
+                                <p class="text-sm font-semibold text-slate-500">
+                                    No hay usuarios registrados
+                                </p>
+
+                                <p class="text-xs text-slate-400 mt-1">
+                                    Agrega una cuenta utilizando el botón Nuevo Usuario.
+                                </p>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- MODAL CREAR / EDITAR -->
+<!-- ====================================================== -->
+
+<div id="modal-user-form"
+     class="fixed inset-0 bg-black/50 items-center justify-center z-50 hidden">
+
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden mx-4">
+
+
+        <!-- CABECERA -->
+
+        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+
+            <div>
+
+                <h3 id="user-modal-title" class="text-lg font-black text-slate-800">
+                    Crear Usuario
+                </h3>
+
+                <p class="text-xs text-slate-400 mt-1">
+                    Cuenta de acceso del estudiante
+                </p>
+
+            </div>
+
+
+            <button type="button"
+                    onclick="closeModal('user-form')"
+                    class="w-8 h-8 rounded-lg bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+
+        <!-- FORMULARIO -->
+
+        <form id="form-usuario-data"
+              onsubmit="saveUserRow(event)"
+              class="p-6 space-y-4 text-sm">
+
+            <input type="hidden" id="form-user-id">
+
+
+            <!-- CARNET -->
+
+            <div>
+
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                    Carnet del Estudiante
+                </label>
+
+
+                <div class="relative">
+
+                    <i class="fa-solid fa-id-card absolute left-3 top-1/2 -translate-y-1/2 text-slate-300"></i>
+
+                    <input type="text"
+                           id="form-user-carnet"
+                           required
+                           placeholder="Ingrese el carnet"
+                           class="w-full border border-slate-200 rounded-xl pl-10 pr-3 py-2.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF]">
+
+                </div>
+
+
+                <p class="text-[10px] text-slate-400 mt-1.5">
+                    El carnet debe existir en el registro de estudiantes.
+                </p>
+
+            </div>
+
+
+            <!-- USUARIO -->
+
+            <div>
+
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                    Usuario
+                </label>
+
+
+                <div class="relative">
+
+                    <i class="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-300"></i>
+
+                    <input type="text"
+                           id="form-user-username"
+                           required
+                           placeholder="Nombre de usuario"
+                           class="w-full border border-slate-200 rounded-xl pl-10 pr-3 py-2.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF]">
+
+                </div>
+
+            </div>
+
+
+            <!-- CONTRASEÑA -->
+
+            <div>
+
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                    Contraseña
+                </label>
+
+
+                <div class="relative">
+
+                    <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-300"></i>
+
+                    <input type="password"
+                           id="form-user-password"
+                           placeholder="Ingrese la contraseña"
+                           class="w-full border border-slate-200 rounded-xl pl-10 pr-3 py-2.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#1E40AF]">
+
+                </div>
+
+
+                <p id="pass-hint" class="text-[10px] text-slate-400 mt-1.5">
+                    La contraseña es obligatoria al crear el usuario.
+                </p>
+
+            </div>
+
+
+            <!-- ESTADO / SESIÓN -->
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+
+
+                <!-- CUENTA ACTIVA -->
+
+                <label class="flex items-center gap-3 border border-slate-100 bg-slate-50 rounded-xl px-4 py-3 cursor-pointer">
+
+                    <input type="checkbox"
+                           id="form-user-estado"
+                           class="rounded text-[#1E40AF] focus:ring-[#1E40AF]"
+                           checked>
+
+                    <div>
+
+                        <p class="text-xs font-bold text-slate-600">
+                            Cuenta activa
+                        </p>
+
+                        <p class="text-[10px] text-slate-400">
+                            Permitir acceso
+                        </p>
+
+                    </div>
+
+                </label>
+
+
+                <!-- SESIÓN -->
+
+                <label class="flex items-center gap-3 border border-slate-100 bg-slate-50 rounded-xl px-4 py-3 cursor-pointer">
+
+                    <input type="checkbox"
+                           id="form-user-sesion"
+                           class="rounded text-[#1E40AF] focus:ring-[#1E40AF]">
+
+                    <div>
+
+                        <p class="text-xs font-bold text-slate-600">
+                            Sesión activa
+                        </p>
+
+                        <p class="text-[10px] text-slate-400">
+                            Estado de sesión
+                        </p>
+
+                    </div>
+
+                </label>
+
+            </div>
+
+
+            <!-- BOTONES -->
+
+            <div class="flex justify-end gap-2 pt-5 mt-2 border-t border-slate-100">
+
+                <button type="button"
+                        onclick="closeModal('user-form')"
+                        class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs transition cursor-pointer">
+
+                    Cancelar
+
+                </button>
+
+
+                <button type="submit"
+                        class="px-5 py-2.5 bg-[#1E40AF] hover:bg-[#1E3A8A] text-white rounded-xl font-bold text-xs shadow-sm transition cursor-pointer">
+
+                    <i class="fa-solid fa-check mr-1"></i>
+                    Guardar
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- CAMBIAR CONTRASEÑA -->
+<!-- ====================================================== -->
+
+<div id="modal-reset-password"
+     class="fixed inset-0 bg-black/50 items-center justify-center z-50 hidden">
+
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden mx-4">
+
+
+        <div class="px-6 py-5 border-b border-slate-100">
+
+            <div class="w-11 h-11 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center mb-3">
+
+                <i class="fa-solid fa-key"></i>
+
+            </div>
+
+
+            <h3 class="text-lg font-black text-slate-800">
+                Cambiar Contraseña
+            </h3>
+
+
+            <p class="text-xs text-slate-400 mt-1">
+
+                Usuario:
+
+                <b id="reset-target-username-display"
+                   class="text-slate-600"></b>
+
+            </p>
+
+        </div>
+
+
+        <div class="p-6">
+
+            <input type="hidden" id="reset-user-id">
+
+
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">
+                Nueva Contraseña
+            </label>
+
+
+            <input type="password"
+                   id="reset-new-pass"
+                   placeholder="Ingrese la nueva contraseña"
+                   class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-100 focus:border-amber-400">
+
+
+            <div class="flex justify-end gap-2 pt-5 mt-5 border-t border-slate-100">
+
+                <button type="button"
+                        onclick="closeModal('reset-password')"
+                        class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs cursor-pointer">
+
+                    Cancelar
+
+                </button>
+
+
+                <button onclick="executePasswordReset()"
+                        class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs cursor-pointer">
+
+                    Actualizar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- ELIMINAR -->
+<!-- ====================================================== -->
+
+<div id="modal-delete-user"
+     class="fixed inset-0 bg-black/50 items-center justify-center z-50 hidden">
+
+    <div class="bg-white w-full max-w-sm rounded-2xl p-7 text-center shadow-2xl mx-4">
+
+
+        <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+
+            <i class="fa-solid fa-trash-can"></i>
+
+        </div>
+
+
+        <h3 class="text-lg font-black text-slate-800 mb-1">
+            ¿Eliminar usuario?
+        </h3>
+
+
+        <p class="text-xs text-slate-400 mb-2">
+            Esta acción no se puede deshacer.
+        </p>
+
+
+        <p class="text-sm text-slate-600 mb-6">
+
+            Usuario:
+
+            <b id="delete-user-name"></b>
+
+        </p>
+
+
+        <input type="hidden" id="delete-user-id">
+
+
+        <div class="flex justify-center gap-2">
+
+            <button onclick="closeModal('delete-user')"
+                    class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs cursor-pointer">
+
+                Cancelar
+
+            </button>
+
+
+            <button onclick="executeDeleteUser()"
+                    class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-xs cursor-pointer">
+
+                Eliminar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- CARGANDO -->
+<!-- ====================================================== -->
+
+<div id="modal-user-loading"
+     class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+
+    <div class="bg-white w-full max-w-xs rounded-2xl p-8 text-center shadow-2xl mx-4">
+
+        <div class="w-14 h-14 border-4 border-slate-200 border-t-[#1E40AF] rounded-full animate-spin mx-auto mb-5"></div>
+
+
+        <h3 id="user-loading-title"
+            class="text-lg font-black text-slate-800 mb-2">
+
+            Procesando...
+
+        </h3>
+
+
+        <p class="text-xs text-slate-400">
+            Espere un momento.
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- MENSAJES -->
+<!-- ====================================================== -->
+
+<div id="modal-user-message"
+     class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+
+    <div class="bg-white w-full max-w-md rounded-3xl p-8 text-center shadow-2xl mx-4">
+
+
+        <div id="user-message-icon-box"
+             class="w-20 h-20 rounded-full border-4 flex items-center justify-center mx-auto mb-5">
+
+            <i id="user-message-icon"
+               class="fa-solid fa-check text-4xl"></i>
+
+        </div>
+
+
+        <h3 id="user-message-title"
+            class="text-2xl font-black text-slate-700 mb-2">
+
+            Mensaje
+
+        </h3>
+
+
+        <p id="user-message-text"
+           class="text-sm text-slate-400 mb-7">
+
+            Operación realizada.
+
+        </p>
+
+
+        <button id="btn-ok-user-message"
+                type="button"
+                class="px-10 py-2.5 rounded-xl text-sm font-black shadow-sm">
+
+            OK
+
+        </button>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+<script>
+
+// =========================================================
+// CSRF
+// =========================================================
+
+function getCookie(name) {
+    let valor = null;
+
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+
+            if (cookie.startsWith(name + "=")) {
+                valor = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+
+    return valor;
+}
+
+
+// =========================================================
+// CERRAR MODAL
+// =========================================================
+
+function closeModal(tipo) {
+    const modal = document.getElementById("modal-" + tipo);
+
+    if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    }
+}
+
+
+// =========================================================
+// CARGANDO
+// =========================================================
+
+function mostrarCargandoUsuario(texto) {
+    document.getElementById("user-loading-title").innerText = texto;
+
+    const modal = document.getElementById("modal-user-loading");
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+
+function ocultarCargandoUsuario() {
+    const modal = document.getElementById("modal-user-loading");
+
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+}
+
+
+// =========================================================
+// MENSAJES
+// =========================================================
+
+function mostrarModalUsuario(titulo, mensaje, tipo = "success", recargar = false) {
+
+    const modal = document.getElementById("modal-user-message");
+    const iconBox = document.getElementById("user-message-icon-box");
+    const icon = document.getElementById("user-message-icon");
+    const btn = document.getElementById("btn-ok-user-message");
+
+    document.getElementById("user-message-title").innerText = titulo;
+    document.getElementById("user-message-text").innerText = mensaje;
+
+
+    if (tipo === "success") {
+
+        iconBox.className = "w-20 h-20 rounded-full border-4 border-emerald-100 flex items-center justify-center mx-auto mb-5";
+
+        icon.className = "fa-solid fa-check text-4xl text-emerald-500";
+
+        btn.className = "bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-10 py-2.5 rounded-xl text-sm font-black shadow-sm cursor-pointer";
+
+    } else {
+
+        iconBox.className = "w-20 h-20 rounded-full border-4 border-red-100 flex items-center justify-center mx-auto mb-5";
+
+        icon.className = "fa-solid fa-xmark text-4xl text-red-500";
+
+        btn.className = "bg-red-500 hover:bg-red-600 text-white px-10 py-2.5 rounded-xl text-sm font-black shadow-sm cursor-pointer";
+
+    }
+
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+
+
+    btn.onclick = function() {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+
+        if (recargar) location.reload();
+    };
+}
+
+
+// =========================================================
+// CREAR / EDITAR
+// =========================================================
+
+function openUserModal(mode, id = null) {
+
+    const form = document.getElementById("form-usuario-data");
+    const password = document.getElementById("form-user-password");
+    const hint = document.getElementById("pass-hint");
+
+    form.reset();
+
+
+    if (mode === "create") {
+
+        document.getElementById("user-modal-title").innerText = "Crear Usuario";
+        document.getElementById("form-user-id").value = "";
+
+        document.getElementById("form-user-estado").checked = true;
+        document.getElementById("form-user-sesion").checked = false;
+
+        password.value = "";
+        password.disabled = false;
+        password.required = true;
+        password.placeholder = "Ingrese la contraseña";
+
+        hint.innerText = "La contraseña es obligatoria al crear el usuario.";
+
+    } else {
+
+        const row = document.getElementById(`user-row-${id}`);
+
+        if (!row) return;
+
+
+        document.getElementById("user-modal-title").innerText = "Editar Usuario";
+
+        document.getElementById("form-user-id").value = row.dataset.id;
+
+        document.getElementById("form-user-carnet").value = row.dataset.carnet;
+
+        document.getElementById("form-user-username").value = row.dataset.usuario;
+
+        document.getElementById("form-user-estado").checked = row.dataset.estado === "true";
+
+        document.getElementById("form-user-sesion").checked = row.dataset.sesion === "true";
+
+
+        password.value = "";
+        password.disabled = true;
+        password.required = false;
+        password.placeholder = "Use el botón Clave para cambiarla";
+
+        hint.innerText = "La contraseña se cambia desde el botón Clave.";
+    }
+
+
+    const modal = document.getElementById("modal-user-form");
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+
+// =========================================================
+// GUARDAR
+// =========================================================
+
+function saveUserRow(event) {
+
+    event.preventDefault();
+
+    const id = document.getElementById("form-user-id").value;
+
+    const data = new FormData();
+
+    data.append("id", id);
+    data.append("carnet", document.getElementById("form-user-carnet").value.trim());
+    data.append("usuario", document.getElementById("form-user-username").value.trim());
+    data.append("rol", "ESTUDIANTE");
+    data.append("estado", document.getElementById("form-user-estado").checked);
+    data.append("sesion_activa", document.getElementById("form-user-sesion").checked);
+
+
+    let url = "/actualizar-usuario/";
+    let mensaje = "El usuario fue actualizado correctamente.";
+
+
+    if (!id) {
+
+        url = "/crear-usuario/";
+        mensaje = "El usuario fue creado correctamente.";
+
+        data.append("contrasena", document.getElementById("form-user-password").value);
+    }
+
+
+    closeModal("user-form");
+
+    mostrarCargandoUsuario("Guardando usuario...");
+
+
+    fetch(url, {
+        method: "POST",
+        headers: {"X-CSRFToken": getCookie("csrftoken")},
+        body: data
+    })
+
+    .then(res => res.json())
+
+    .then(res => {
+
+        ocultarCargandoUsuario();
+
+
+        if (res.mensaje === "ok") {
+
+            mostrarModalUsuario(
+                "Guardado correctamente",
+                mensaje,
+                "success",
+                true
+            );
+
+        } else {
+
+            mostrarModalUsuario(
+                "No se pudo guardar",
+                res.detalle || "Ocurrió un error.",
+                "error"
+            );
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
+        ocultarCargandoUsuario();
+
+        mostrarModalUsuario(
+            "Error de conexión",
+            "No se pudo conectar con el servidor.",
+            "error"
+        );
+
+    });
+}
+
+
+// =========================================================
+// CONTRASEÑA
+// =========================================================
+
+function openResetPasswordModal(id) {
+
+    const row = document.getElementById(`user-row-${id}`);
+
+    if (!row) return;
+
+
+    document.getElementById("reset-user-id").value = id;
+
+    document.getElementById("reset-target-username-display").innerText = row.dataset.usuario;
+
+    document.getElementById("reset-new-pass").value = "";
+
+
+    const modal = document.getElementById("modal-reset-password");
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+
+function executePasswordReset() {
+
+    const id = document.getElementById("reset-user-id").value;
+
+    const contrasena = document.getElementById("reset-new-pass").value.trim();
+
+
+    if (!contrasena) {
+
+        mostrarModalUsuario(
+            "Contraseña requerida",
+            "Debe ingresar una nueva contraseña.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const data = new FormData();
+
+    data.append("id", id);
+    data.append("contrasena", contrasena);
+
+
+    closeModal("reset-password");
+
+    mostrarCargandoUsuario("Actualizando contraseña...");
+
+
+    fetch("/actualizar-password-usuario/", {
+        method: "POST",
+        headers: {"X-CSRFToken": getCookie("csrftoken")},
+        body: data
+    })
+
+    .then(res => res.json())
+
+    .then(res => {
+
+        ocultarCargandoUsuario();
+
+
+        if (res.mensaje === "ok") {
+
+            mostrarModalUsuario(
+                "Clave actualizada",
+                "La contraseña fue actualizada correctamente.",
+                "success"
+            );
+
+        } else {
+
+            mostrarModalUsuario(
+                "No se pudo actualizar",
+                res.detalle || "Ocurrió un error.",
+                "error"
+            );
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
+        ocultarCargandoUsuario();
+
+        mostrarModalUsuario(
+            "Error de conexión",
+            "No se pudo conectar con el servidor.",
+            "error"
+        );
+
+    });
+}
+
+
+// =========================================================
+// ELIMINAR
+// =========================================================
+
+function openDeleteUserModal(id) {
+
+    const row = document.getElementById(`user-row-${id}`);
+
+    if (!row) return;
+
+
+    document.getElementById("delete-user-id").value = id;
+
+    document.getElementById("delete-user-name").innerText = row.dataset.usuario;
+
+
+    const modal = document.getElementById("modal-delete-user");
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+
+function executeDeleteUser() {
+
+    const id = document.getElementById("delete-user-id").value;
+
+    const data = new FormData();
+
+    data.append("id", id);
+
+
+    closeModal("delete-user");
+
+    mostrarCargandoUsuario("Eliminando usuario...");
+
+
+    fetch("/eliminar-usuario/", {
+        method: "POST",
+        headers: {"X-CSRFToken": getCookie("csrftoken")},
+        body: data
+    })
+
+    .then(res => res.json())
+
+    .then(res => {
+
+        ocultarCargandoUsuario();
+
+
+        if (res.mensaje === "ok") {
+
+            mostrarModalUsuario(
+                "Usuario eliminado",
+                "El usuario fue eliminado correctamente.",
+                "success",
+                true
+            );
+
+        } else {
+
+            mostrarModalUsuario(
+                "No se pudo eliminar",
+                res.detalle || "Ocurrió un error.",
+                "error"
+            );
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
+        ocultarCargandoUsuario();
+
+        mostrarModalUsuario(
+            "Error de conexión",
+            "No se pudo conectar con el servidor.",
+            "error"
+        );
+
+    });
+}
+
+
+// =========================================================
+// BUSCADOR
+// =========================================================
+
+function filtrarUsuarios() {
+
+    const texto = document.getElementById("buscar-usuario").value.toLowerCase().trim();
+
+    const filas = document.querySelectorAll(".user-row");
+
+    let visibles = 0;
+
+
+    filas.forEach(fila => {
+
+        const usuario = fila.dataset.usuario.toLowerCase();
+
+        const carnet = (fila.dataset.carnet || "").toLowerCase();
+
+        const coincide = usuario.includes(texto) || carnet.includes(texto);
+
+
+        if (coincide) {
+
+            fila.classList.remove("hidden");
+
+            visibles++;
+
+        } else {
+
+            fila.classList.add("hidden");
+
+        }
+
+    });
+
+
+    document.getElementById("contador-usuarios").innerText =
+        visibles === 1 ? "1 usuario" : `${visibles} usuarios`;
+}
+
+
+// =========================================================
+// CERRAR MODALES AL TOCAR FONDO
+// =========================================================
+
+document.addEventListener("click", function(event) {
+
+    [
+        "modal-user-form",
+        "modal-reset-password",
+        "modal-delete-user"
+    ].forEach(id => {
+
+        const modal = document.getElementById(id);
+
+        if (event.target === modal) {
+
+            modal.classList.add("hidden");
+
+            modal.classList.remove("flex");
+
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

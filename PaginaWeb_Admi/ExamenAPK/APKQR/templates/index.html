@@ -1,0 +1,153 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Iniciar sesión</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet"
+          href="{% static 'css/index/login.css' %}?v=2">
+
+</head>
+
+<body>
+
+    <main class="login-container">
+
+        <div class="login-card">
+
+            <!-- LOGO -->
+            <div class="logo-container">
+
+                <img
+                    src="https://vtryizusiddlydztsgax.supabase.co/storage/v1/object/public/fotosEstudinates/2logo.png"
+                    alt="Logo INATEC"
+                    class="login-logo"
+                >
+
+            </div>
+
+
+            <!-- ENCABEZADO -->
+            <div class="login-header">
+
+                <h1>
+                    Sistema Administrativo
+                </h1>
+
+                <p>
+                    Comedor e Internado 
+                </p>
+
+            </div>
+
+
+            <!-- FORMULARIO -->
+            <form method="POST" class="login-form">
+
+                {% csrf_token %}
+
+                <!-- USUARIO -->
+                <div class="input-group">
+
+                    <label for="usuario">
+                        Usuario
+                    </label>
+
+                    <div class="input-container">
+
+                        <i class="fa-solid fa-user input-icon"></i>
+
+                        <input
+                            id="usuario"
+                            type="text"
+                            name="usuario"
+                            placeholder="Ingrese su usuario"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- CONTRASEÑA -->
+                <div class="input-group">
+
+                    <label for="contrasena">
+                        Contraseña
+                    </label>
+
+                    <div class="input-container">
+
+                        <i class="fa-solid fa-lock input-icon"></i>
+
+                        <input
+                            id="contrasena"
+                            type="password"
+                            name="contrasena"
+                            placeholder="Ingrese su contraseña"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- MENSAJE DE ERROR -->
+                {% if error %}
+
+                    <div class="mensaje-error">
+
+                        <i class="fa-solid fa-circle-exclamation"></i>
+
+                        <span>
+                            {{ error }}
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- BOTÓN -->
+                <button type="submit" class="btn-ingresar">
+
+                    <i class="fa-solid fa-right-to-bracket"></i>
+
+                    Ingresar
+
+                </button>
+
+            </form>
+
+
+            <!-- PIE -->
+            <div class="login-footer">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                Acceso exclusivo para personal autorizado
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

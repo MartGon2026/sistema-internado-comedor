@@ -1,0 +1,1213 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- ===================================================== -->
+<!-- CABECERA Y FILTRO POR FECHAS -->
+<!-- ===================================================== -->
+
+<header class="bg-white shadow-sm px-8 py-4 flex flex-col xl:flex-row
+               justify-between items-start xl:items-center gap-4
+               border-b border-gray-200">
+
+    <div>
+        <h1 class="text-2xl font-extrabold text-gray-800 tracking-tight uppercase">
+            Panel Administrativo
+        </h1>
+
+        <p class="text-sm font-semibold text-[#053e2e]">
+            Comedor e Internado
+        </p>
+    </div>
+
+    <form method="get"
+          class="flex flex-wrap items-center gap-3 bg-gray-50
+                 p-2 rounded-xl border border-gray-200 shadow-sm">
+
+        <span class="text-xs font-bold text-gray-500 uppercase px-2">
+
+            <i class="fa-solid fa-calendar-days mr-1 text-[#053e2e]"></i>
+
+            Rango:
+
+        </span>
+
+        <div class="flex items-center gap-2">
+
+            <label for="desde"
+                   class="text-xs text-gray-600 font-medium">
+
+                Desde:
+
+            </label>
+
+            <input
+                id="desde"
+                type="date"
+                name="desde"
+                value="{{ desde|date:'Y-m-d' }}"
+                class="bg-white border border-gray-300 rounded-lg
+                       px-2 py-1.5 text-sm focus:outline-none
+                       focus:ring-2 focus:ring-[#053e2e]/20"
+            >
+
+        </div>
+
+        <div class="flex items-center gap-2">
+
+            <label for="hasta"
+                   class="text-xs text-gray-600 font-medium">
+
+                Hasta:
+
+            </label>
+
+            <input
+                id="hasta"
+                type="date"
+                name="hasta"
+                value="{{ hasta|date:'Y-m-d' }}"
+                class="bg-white border border-gray-300 rounded-lg
+                       px-2 py-1.5 text-sm focus:outline-none
+                       focus:ring-2 focus:ring-[#053e2e]/20"
+            >
+
+        </div>
+
+        <button
+            type="submit"
+            class="bg-[#053e2e] text-white px-4 py-2 rounded-lg
+                   text-xs font-bold hover:bg-[#043326]
+                   transition cursor-pointer">
+
+            <i class="fa-solid fa-filter mr-1"></i>
+
+            Filtrar
+
+        </button>
+
+        <a href="?"
+           class="bg-white text-gray-600 border border-gray-300
+                  px-3 py-2 rounded-lg text-xs font-bold
+                  hover:bg-gray-100 transition">
+
+            <i class="fa-solid fa-calendar-day mr-1"></i>
+
+            Hoy
+
+        </a>
+
+    </form>
+
+</header>
+
+
+<!-- ===================================================== -->
+<!-- TARJETAS PRINCIPALES -->
+<!-- ===================================================== -->
+
+<section class="px-8 pt-6 pb-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+
+    <!-- TOTAL DE ESTUDIANTES -->
+
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm
+                flex items-center gap-4">
+
+        <div class="w-14 h-14 min-w-14 rounded-full bg-blue-50 text-blue-600
+                    flex items-center justify-center text-2xl">
+
+            <i class="fa-solid fa-users"></i>
+
+        </div>
+
+        <div>
+
+            <p class="text-xs font-bold text-gray-700 uppercase">
+
+                Total estudiantes
+
+            </p>
+
+            <h3 class="text-2xl font-black text-blue-600">
+
+                {{ total_estudiantes }}
+
+            </h3>
+
+            <p class="text-xs text-gray-400">
+
+                Registrados en el sistema
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ASISTENCIAS DEL COMEDOR -->
+
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm
+                flex items-center gap-4">
+
+        <div class="w-14 h-14 min-w-14 rounded-full bg-orange-50 text-orange-500
+                    flex items-center justify-center text-2xl">
+
+            <i class="fa-solid fa-utensils"></i>
+
+        </div>
+
+        <div>
+
+            <p class="text-xs font-bold text-gray-700 uppercase">
+
+                Asistencias comedor
+
+            </p>
+
+            <h3 class="text-2xl font-black text-orange-500">
+
+                {{ asistencias_rango }}
+
+            </h3>
+
+            <p class="text-xs text-gray-400">
+
+                Registro general
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ESTUDIANTES DENTRO -->
+
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm
+                flex items-center gap-4">
+
+        <div class="w-14 h-14 min-w-14 rounded-full bg-emerald-50 text-emerald-600
+                    flex items-center justify-center text-2xl">
+
+            <i class="fa-solid fa-door-closed"></i>
+
+        </div>
+
+        <div>
+
+            <p class="text-xs font-bold text-gray-700 uppercase">
+
+                Dentro del internado
+
+            </p>
+
+            <h3 class="text-2xl font-black text-emerald-600">
+
+                {{ estudiantes_dentro }}
+
+            </h3>
+
+            <p class="text-xs text-gray-400">
+
+                Estado actual
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ESTUDIANTES FUERA -->
+
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm
+                flex items-center gap-4">
+
+        <div class="w-14 h-14 min-w-14 rounded-full bg-red-50 text-red-500
+                    flex items-center justify-center text-2xl">
+
+            <i class="fa-solid fa-person-walking-arrow-right"></i>
+
+        </div>
+
+        <div>
+
+            <p class="text-xs font-bold text-gray-700 uppercase">
+
+                Fuera del internado
+
+            </p>
+
+            <h3 class="text-2xl font-black text-red-500">
+
+                {{ estudiantes_fuera }}
+
+            </h3>
+
+            <p class="text-xs text-gray-400">
+
+                Estado actual
+
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- RESUMEN DEL COMEDOR E INTERNADO -->
+<!-- ===================================================== -->
+
+<section class="px-8 py-4 grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+    <!-- ================================================= -->
+    <!-- RESUMEN DEL COMEDOR -->
+    <!-- ================================================= -->
+
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+
+        <div class="flex flex-col sm:flex-row sm:items-center
+                    justify-between gap-2 mb-5">
+
+            <h4 class="font-bold text-gray-800 uppercase text-sm">
+
+                Resumen del comedor
+
+            </h4>
+
+            <span class="text-xs font-semibold text-gray-400">
+
+                {{ desde|date:"d/m/Y" }}
+                al
+                {{ hasta|date:"d/m/Y" }}
+
+            </span>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+
+            <div style="height: 230px;">
+
+                <canvas id="chartComedor"></canvas>
+
+            </div>
+
+            <div class="space-y-3">
+
+                <!-- DESAYUNOS -->
+
+                <div class="flex items-center justify-between
+                    bg-[#EAF0FF] border border-[#BDD0FF]
+                    rounded-xl px-4 py-3">
+
+                    <div class="flex items-center gap-3">
+
+                        <div class="w-9 h-9 bg-white rounded-lg
+                                    text-blue-600 flex items-center
+                                    justify-center">
+
+                            <i class="fa-solid fa-mug-saucer"></i>
+
+                        </div>
+
+                        <span class="text-sm font-semibold text-gray-700">
+
+                            Desayunos
+
+                        </span>
+
+                    </div>
+
+                    <span class="font-black text-blue-600">
+
+                        {{ desayunos_servidos }}
+
+                    </span>
+
+                </div>
+
+
+                <!-- ALMUERZOS -->
+
+                <div class="flex items-center justify-between
+                    bg-[#FFF1E6] border border-[#F6C89F]
+                    rounded-xl px-4 py-3">
+
+                    <div class="flex items-center gap-3">
+
+                        <div class="w-9 h-9 bg-white rounded-lg
+                                    text-orange-500 flex items-center
+                                    justify-center">
+
+                            <i class="fa-solid fa-bowl-food"></i>
+
+                        </div>
+
+                        <span class="text-sm font-semibold text-gray-700">
+
+                            Almuerzos
+
+                        </span>
+
+                    </div>
+
+                    <span class="font-black text-orange-500">
+
+                        {{ almuerzos_servidos }}
+
+                    </span>
+
+                </div>
+
+
+                <!-- CENAS -->
+
+                <div class="flex items-center justify-between
+                            bg-[#F3E8FF] border border-[#D8B4FE]
+                            rounded-xl px-4 py-3">
+
+                    <div class="flex items-center gap-3">
+
+                        <div class="w-9 h-9 bg-white rounded-lg
+                                    text-purple-600 flex items-center
+                                    justify-center">
+
+                            <i class="fa-solid fa-moon"></i>
+
+                        </div>
+
+                        <span class="text-sm font-semibold text-gray-700">
+
+                            Cenas
+
+                        </span>
+
+                    </div>
+
+                    <span class="font-black text-purple-600">
+
+                        {{ cenas_servidas }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- RESUMEN DEL INTERNADO -->
+    <!-- ================================================= -->
+
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+
+        <div class="flex flex-col sm:flex-row sm:items-center
+                    justify-between gap-2 mb-5">
+
+            <h4 class="font-bold text-gray-700 uppercase text-sm">
+
+                Resumen del internado
+
+            </h4>
+
+            <span class="text-xs font-semibold text-gray-400">
+
+                {{ desde|date:"d/m/Y" }}
+                al
+                {{ hasta|date:"d/m/Y" }}
+
+            </span>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+
+            <div class="space-y-3">
+
+                <!-- SALIDAS -->
+
+                <div class="flex items-center justify-between bg-[#FFEAEA] rounded-xl px-4 py-3">
+                            
+    
+                    <div class="flex items-center gap-3">
+
+                        <div class="w-9 h-9 bg-white rounded-lg  text-red-500 flex items-center  justify-center">
+
+                            <i class="fa-solid fa-right-from-bracket"></i>
+
+                        </div>
+
+                        <div>
+
+                            <p class="text-sm font-semibold text-gray-700">
+
+                                Salidas
+
+                            </p>
+
+                            <p class="text-[10px] text-gray-400">
+
+                                En el rango seleccionado
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <span class="font-black text-red-500">
+
+                        {{ salidas_rango }}
+
+                    </span>
+
+                </div>
+
+
+                <!-- ENTRADAS -->
+
+                <div class="flex items-center justify-between bg-[#E8F7F0] rounded-xl px-4 py-3">
+
+                    <div class="flex items-center gap-3">
+
+                        <div class="w-9 h-9 bg-white rounded-lg
+                                    text-emerald-600 flex items-center
+                                    justify-center">
+
+                            <i class="fa-solid fa-right-to-bracket"></i>
+
+                        </div>
+
+                        <div>
+
+                            <p class="text-sm font-semibold text-gray-700">
+
+                                Entradas
+
+                            </p>
+
+                            <p class="text-[10px] text-gray-400">
+
+                                En el rango seleccionado
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <span class="font-black text-emerald-600">
+
+                        {{ entradas_rango }}
+
+                    </span>
+
+                </div>
+
+
+                <!-- NO HAN REGRESADO -->
+
+                <div class="flex items-center justify-between
+                              bg-[#F2EAF8] rounded-xl px-4 py-3">
+
+                    <div class="flex items-center gap-3">
+
+                        <div class="w-9 h-9 bg-white rounded-lg
+                                    text-purple-600 flex items-center
+                                    justify-center">
+
+                            <i class="fa-solid fa-clock"></i>
+
+                        </div>
+
+                        <div>
+
+                            <p class="text-sm font-semibold text-gray-700">
+
+                                No han regresado
+
+                            </p>
+
+                            <p class="text-[10px] text-gray-400">
+
+                                Salieron y siguen fuera
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <span class="font-black text-purple-600">
+
+                        {{ no_han_regresado }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div style="height: 230px;">
+
+                <canvas id="chartInternado"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- ESTUDIANTES PENDIENTES O ÚLTIMOS MOVIMIENTOS -->
+<!-- ===================================================== -->
+
+<section class="px-8 pb-8">
+
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+
+        {% if estudiantes_faltantes %}
+
+            <!-- ============================================= -->
+            <!-- ESTUDIANTES QUE NO HAN REGRESADO -->
+            <!-- ============================================= -->
+
+            <div class="flex flex-col sm:flex-row sm:items-center
+                        justify-between gap-3 mb-5">
+
+                <div>
+
+                    <h4 class="font-bold text-gray-700 uppercase text-sm">
+
+                        <i class="fa-solid fa-triangle-exclamation
+                                  text-orange-500 mr-2"></i>
+
+                        Estudiantes que no han regresado
+
+                    </h4>
+
+                    <p class="text-xs text-gray-400 mt-1">
+
+                        Registraron una salida y todavía no tienen
+                        una entrada registrada.
+
+                    </p>
+
+                </div>
+
+                <div class="inline-flex items-center gap-2
+                            bg-orange-50 text-orange-600
+                            px-4 py-2 rounded-xl text-xs font-bold">
+
+                    <i class="fa-solid fa-user-clock"></i>
+
+                    {{ estudiantes_faltantes|length }}
+
+                    {% if estudiantes_faltantes|length == 1 %}
+
+                        estudiante pendiente
+
+                    {% else %}
+
+                        estudiantes pendientes
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full min-w-[950px] text-left text-sm">
+
+                  <thead class="bg-[#2563EB] text-white uppercase
+              text-xs font-bold">
+
+                        <tr>
+
+                            <th class="py-3 px-4">
+                                Carnet
+                            </th>
+
+                            <th class="py-3 px-4">
+                                Estudiante
+                            </th>
+
+                            <th class="py-3 px-4">
+                                Carrera
+                            </th>
+
+                            <th class="py-3 px-4">
+                                Fecha de salida
+                            </th>
+
+                            <th class="py-3 px-4">
+                                Hora de salida
+                            </th>
+
+                            <th class="py-3 px-4">
+                                Estado
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody class="divide-y divide-gray-100 font-medium">
+
+                        {% for faltante in estudiantes_faltantes %}
+
+                            <tr class="hover:bg-orange-50/40 transition">
+
+                                <td class="py-3 px-4 text-xs font-mono
+                                           text-gray-600">
+
+                                    {{ faltante.carnet.carnet }}
+
+                                </td>
+
+                                <td class="py-3 px-4 text-gray-700 font-semibold">
+
+                                    {{ faltante.carnet.nombres }}
+                                    {{ faltante.carnet.apellidos }}
+
+                                </td>
+
+                                <td class="py-3 px-4 text-gray-600">
+
+                                    {{ faltante.carnet.carrera }}
+
+                                </td>
+
+                                <td class="py-3 px-4 text-gray-600">
+
+                                    {{ faltante.fecha_salida|date:"d/m/Y" }}
+
+                                </td>
+
+                                <td class="py-3 px-4 text-gray-600">
+
+                                    {{ faltante.hora_salida|time:"h:i A" }}
+
+                                </td>
+
+                                <td class="py-3 px-4">
+
+                                    <span class="inline-flex items-center gap-1.5
+                                                 bg-orange-100 text-orange-700
+                                                 px-3 py-1 rounded-lg
+                                                 text-xs font-bold">
+
+                                        <i class="fa-solid fa-clock"></i>
+
+                                        NO HA REGRESADO
+
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        {% else %}
+
+            <!-- ============================================= -->
+            <!-- ÚLTIMOS MOVIMIENTOS -->
+            <!-- ============================================= -->
+
+            <div class="flex flex-col sm:flex-row sm:items-center
+                        justify-between gap-3 mb-5">
+
+                <div>
+
+                    <h4 class="font-bold text-gray-700 uppercase text-sm">
+
+                        <i class="fa-solid fa-circle-check
+                                  text-emerald-500 mr-2"></i>
+
+                        Últimos movimientos del internado
+
+                    </h4>
+
+                    <p class="text-xs text-emerald-600 mt-1 font-semibold">
+
+                        <i class="fa-solid fa-check mr-1"></i>
+
+                        No hay estudiantes pendientes de regresar.
+
+                    </p>
+
+                </div>
+
+                <span class="text-xs font-semibold text-gray-400">
+
+                    {{ desde|date:"d/m/Y" }}
+                    al
+                    {{ hasta|date:"d/m/Y" }}
+
+                </span>
+
+            </div>
+
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full min-w-[850px] text-left text-sm">
+
+                    <thead class="bg-gray-50 text-gray-500 uppercase
+                                  text-xs font-bold">
+
+                        <tr>
+
+                            <th class="py-3 px-4">
+                                Carnet
+                            </th>
+
+                            <th class="py-3 px-4">
+                                Estudiante
+                            </th>
+
+                            <th class="py-3 px-4">
+                                Movimiento
+                            </th>
+
+                            <th class="py-3 px-4">
+                                Fecha
+                            </th>
+
+                            <th class="py-3 px-4">
+                                Hora
+                            </th>
+
+                            <th class="py-3 px-4">
+                                Estado
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody class="divide-y divide-gray-100 font-medium">
+
+                        {% for movimiento in ultimos_movimientos %}
+
+                            <tr class="hover:bg-gray-50 transition">
+
+                                <td class="py-3 px-4 text-xs font-mono
+                                           text-gray-600">
+
+                                    {{ movimiento.carnet }}
+
+                                </td>
+
+                                <td class="py-3 px-4 text-gray-700">
+
+                                    {{ movimiento.estudiante }}
+
+                                </td>
+
+                                <td class="py-3 px-4">
+
+                                    {% if movimiento.tipo == "Salida" %}
+
+                                        <span class="inline-flex items-center
+                                                     gap-1 text-red-500
+                                                     font-bold">
+
+                                            <i class="fa-solid
+                                                      fa-arrow-right-from-bracket">
+                                            </i>
+
+                                            Salida
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="inline-flex items-center
+                                                     gap-1 text-emerald-600
+                                                     font-bold">
+
+                                            <i class="fa-solid
+                                                      fa-arrow-right-to-bracket">
+                                            </i>
+
+                                            Entrada
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td class="py-3 px-4 text-gray-600">
+
+                                    {{ movimiento.fecha|date:"d/m/Y" }}
+
+                                </td>
+
+                                <td class="py-3 px-4 text-gray-600">
+
+                                    {{ movimiento.hora|time:"h:i A" }}
+
+                                </td>
+
+                                <td class="py-3 px-4">
+
+                                    {% if movimiento.estado == "DENTRO" %}
+
+                                        <span class="inline-flex
+                                                     bg-emerald-100
+                                                     text-emerald-700
+                                                     px-3 py-1 rounded-lg
+                                                     text-xs font-bold">
+
+                                            DENTRO
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="inline-flex
+                                                     bg-orange-100
+                                                     text-orange-600
+                                                     px-3 py-1 rounded-lg
+                                                     text-xs font-bold">
+
+                                            FUERA
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        {% empty %}
+
+                            <tr>
+
+                                <td colspan="6"
+                                    class="py-8 text-center text-gray-400">
+
+                                    <i class="fa-solid fa-clock-rotate-left
+                                              text-2xl mb-2 block"></i>
+
+                                    No hay movimientos registrados en el
+                                    rango seleccionado.
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        Chart.register(ChartDataLabels);
+
+
+        // =================================================
+        // GRÁFICA DEL COMEDOR
+        // =================================================
+
+        const datosComedor = [
+
+            Number("{{ desayunos_servidos|default:0 }}"),
+
+            Number("{{ almuerzos_servidos|default:0 }}"),
+
+            Number("{{ cenas_servidas|default:0 }}")
+
+        ];
+
+
+        new Chart(
+
+            document.getElementById("chartComedor").getContext("2d"),
+
+            {
+
+                type: "doughnut",
+
+                data: {
+
+                    labels: [
+
+                        "Desayunos",
+
+                        "Almuerzos",
+
+                        "Cenas"
+
+                    ],
+
+                    datasets: [
+
+                        {
+
+                            data: datosComedor,
+
+                            backgroundColor: [
+
+                                "#042670",
+
+                                "#ca5b0c",
+
+                                "#500596"
+
+                            ],
+
+                            borderColor: "#FFFFFF",
+
+                            borderWidth: 3,
+
+                            hoverOffset: 5
+
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    cutout: "55%",
+
+                    plugins: {
+
+                        legend: {
+
+                            display: false
+
+                        },
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                label: function (context) {
+
+                                    return context.label + ": " + context.raw;
+
+                                }
+
+                            }
+
+                        },
+
+                        datalabels: {
+
+                            color: "#FFFFFF",
+
+                            font: {
+
+                                weight: "bold",
+
+                                size: 18
+
+                            },
+
+                            formatter: function (value) {
+
+                                return value > 0 ? value : "";
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        );
+
+
+        // =================================================
+        // GRÁFICA DEL INTERNADO
+        // =================================================
+
+        const datosInternado = [
+
+            Number("{{ estudiantes_dentro|default:0 }}"),
+
+            Number("{{ estudiantes_fuera|default:0 }}")
+
+        ];
+
+
+        new Chart(
+
+            document.getElementById("chartInternado").getContext("2d"),
+
+            {
+
+                type: "doughnut",
+
+                data: {
+
+                    labels: [
+
+                        "Dentro",
+
+                        "Fuera"
+
+                    ],
+
+                    datasets: [
+
+                        {
+
+                            data: datosInternado,
+
+                            backgroundColor: [
+
+                                "#009758",
+
+                                "#e70909"
+
+                            ],
+
+                            borderColor: "#FFFFFF",
+
+                            borderWidth: 3,
+
+                            hoverOffset: 5
+
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    cutout: "55%",
+
+                    plugins: {
+
+                        legend: {
+
+                            position: "bottom",
+
+                            labels: {
+
+                                boxWidth: 12,
+
+                                usePointStyle: true,
+
+                                pointStyle: "circle",
+
+                                font: {
+
+                                    size: 11
+
+                                }
+
+                            }
+
+                        },
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                label: function (context) {
+
+                                    return context.label + ": " + context.raw;
+
+                                }
+
+                            }
+
+                        },
+
+                        datalabels: {
+
+                            color: "#FFFFFF",
+
+                            font: {
+
+                                weight: "bold",
+
+                                size: 18
+
+                            },
+
+                            formatter: function (value) {
+
+                                return value > 0 ? value : "";
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        );
+
+    });
+
+</script>
+
+{% endblock %}

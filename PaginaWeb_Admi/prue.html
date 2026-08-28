@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Encuesta de Seguridad Informática - BICU</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 25px;
+            color: #222;
+        }
+
+        .encuesta {
+            max-width: 850px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #064e3b;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 17px;
+            font-weight: normal;
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .descripcion {
+            background: #eef7f3;
+            border-left: 5px solid #064e3b;
+            padding: 15px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .datos {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 9px;
+            border: 1px solid #bbb;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .pregunta {
+            margin-bottom: 22px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .pregunta p {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .opciones label {
+            font-weight: normal;
+            display: block;
+            margin: 6px 0;
+        }
+
+        .opciones input {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            background: #064e3b;
+            color: white;
+            border: none;
+            padding: 13px;
+            font-size: 16px;
+            border-radius: 7px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #047857;
+        }
+    </style>
+</head>
+<body>
+
+<div class="encuesta">
+
+    <h1>Encuesta Diagnóstica de Seguridad Informática</h1>
+    <h2>Bluefields Indian & Caribbean University - Sede Central</h2>
+
+    <div class="descripcion">
+        Esta encuesta está dirigida a personal de TI, docentes, encargados de laboratorios,
+        personal administrativo y estudiantes que utilizan o supervisan los recursos tecnológicos
+        de la universidad. Su finalidad es recopilar información para sustentar el Plan de Seguridad Informática.
+    </div>
+
+    <form>
+
+        <div class="datos">
+            <div>
+                <label>Tipo de participante</label>
+                <select required>
+                    <option value="">Seleccione una opción</option>
+                    <option>Personal de TI</option>
+                    <option>Docente</option>
+                    <option>Encargado de laboratorio</option>
+                    <option>Personal administrativo</option>
+                    <option>Estudiante</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Área o dependencia</label>
+                <input type="text" placeholder="Ejemplo: Laboratorio, administración, informática">
+            </div>
+        </div>
+
+        <div class="pregunta">
+            <p>1. ¿En los equipos que utiliza o supervisa se restringe la instalación de software no autorizado?</p>
+            <div class="opciones">
+                <label><input type="radio" name="p1"> Sí</label>
+                <label><input type="radio" name="p1"> No</label>
+                <label><input type="radio" name="p1"> Parcialmente</label>
+                <label><input type="radio" name="p1"> No sabe</label>
+            </div>
+        </div>
+
+        <div class="pregunta">
+            <p>2. ¿Los usuarios tienen permisos adecuados según su rol dentro de la institución?</p>
+            <div class="opciones">
+                <label><input type="radio" name="p2"> Sí</label>
+                <label><input type="radio" name="p2"> No</label>
+                <label><input type="radio" name="p2"> Parcialmente</label>
+                <label><input type="radio" name="p2"> No sabe</label>
+            </div>
+        </div>
+
+        <div class="pregunta">
+            <p>3. ¿Ha observado instalación de programas no autorizados en equipos institucionales?</p>
+            <div class="opciones">
+                <label><input type="radio" name="p3"> Frecuentemente</label>
+                <label><input type="radio" name="p3"> Algunas veces</label>
+                <label><input type="radio" name="p3"> Nunca</label>
+                <label><input type="radio" name="p3"> No sabe</label>
+            </div>
+        </div>
+
+        <div class="pregunta">
+            <p>4. ¿Existe control sobre el uso de memorias USB u otros dispositivos externos?</p>
+            <div class="opciones">
+                <label><input type="radio" name="p4"> Sí</label>
+                <label><input type="radio" name="p4"> No</label>
+                <label><input type="radio" name="p4"> Parcialmente</label>
+                <label><input type="radio" name="p4"> No sabe</label>
+            </div>
+        </div>
+
+        <div class="pregunta">
+            <p>5. ¿Los equipos cuentan con antivirus actualizado o herramientas de protección activa?</p>
+            <div class="opciones">
+                <label><input type="radio" name="p5"> Sí</label>
+                <label><input type="radio" name="p5"> No</label>
+                <label><input type="radio" name="p5"> Parcialmente</label>
+                <label><input type="radio" name="p5"> No sabe</label>
+            </div>
+        </div>
+
+        <div class="pregunta">
+            <p>6. ¿Se realiza mantenimiento preventivo a los equipos de forma periódica?</p>
+            <div class="opciones">
+                <label><input type="radio" name="p6"> Sí</label>
+                <label><input type="radio" name="p6"> No</label>
+                <label><input type="radio" name="p6"> A veces</label>
+                <label><input type="radio" name="p6"> No sabe</label>
+            </div>
+        </div>
+
+        <div class="pregunta">
+            <p>7. ¿Se reportan los incidentes relacionados con virus, fallas, accesos indebidos o mal uso de los equipos?</p>
+            <div class="opciones">
+                <label><input type="radio" name="p7"> Sí</label>
+                <label><input type="radio" name="p7"> No</label>
+                <label><input type="radio" name="p7"> A veces</label>
+                <label><input type="radio" name="p7"> No sabe</label>
+            </div>
+        </div>
+
+        <div class="pregunta">
+            <p>8. ¿Considera necesario fortalecer las políticas de seguridad informática en la institución?</p>
+            <div class="opciones">
+                <label><input type="radio" name="p8"> Totalmente necesario</label>
+                <label><input type="radio" name="p8"> Necesario</label>
+                <label><input type="radio" name="p8"> Poco necesario</label>
+                <label><input type="radio" name="p8"> No necesario</label>
+            </div>
+        </div>
+
+        <label>Observaciones adicionales</label>
+        <textarea placeholder="Escriba alguna observación relacionada con la seguridad informática, uso de equipos o controles existentes."></textarea>
+
+        <button type="submit">Enviar encuesta</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

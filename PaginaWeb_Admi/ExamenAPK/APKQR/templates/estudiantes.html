@@ -1,0 +1,1205 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- ====================================================== -->
+<!-- CABECERA -->
+<!-- ====================================================== -->
+
+<header class="bg-white shadow-sm px-8 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200">
+    <div>
+        <h1 class="text-2xl font-extrabold text-gray-800 uppercase">Administración de Estudiantes</h1>
+        
+    </div>
+
+    <div class="flex space-x-2">
+        <button onclick="openModal('create')" class="bg-[#1E40AF] hover:bg-[#1E3A8A] text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md cursor-pointer">
+                <i class="fa-solid fa-user-plus mr-2"></i>Registrar Manual
+        </button>
+    </div>
+</header>
+
+
+<!-- AQUÍ ESTÁ EL CAMBIO IMPORTANTE -->
+<section class="px-8 pt-3 pb-8 space-y-3">
+
+    <!-- ================================================== -->
+    <!-- IMPORTACIÓN EXCEL -->
+    <!-- ================================================== -->
+
+    <div class="bg-white px-6 py-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+
+        <div class="space-y-1">
+            <h3 class="font-bold text-gray-800 text-sm uppercase flex items-center">
+                <i class="fa-solid fa-file-excel text-emerald-600 text-lg mr-2"></i>
+                Importación Masiva Excel
+            </h3>
+
+            <p class="text-xs text-gray-400">
+                Formato: carnet, nombres, apellidos, carrera, edad, ano, procedencia, tipo
+            </p>
+        </div>
+
+
+        <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
+
+            <label class="bg-gray-100 text-gray-600 border border-gray-300 px-4 py-2 rounded-xl text-xs font-bold cursor-pointer hover:bg-gray-200 transition">
+                <i class="fa-solid fa-folder-open mr-2"></i>Seleccionar Excel
+
+                <input type="file" id="csv-file-input" accept=".xlsx" class="hidden" onchange="handleCSVSelect()">
+            </label>
+
+
+            <button onclick="processCSV()" id="btn-upload-csv" disabled
+                    class="bg-emerald-600 text-white px-5 py-2 rounded-xl text-xs font-bold opacity-50 cursor-not-allowed transition shadow-md">
+
+                <i class="fa-solid fa-cloud-arrow-up mr-2"></i>Cargar Excel
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- BUSCADOR + FILTRO + CONTADORES FIJOS -->
+    <!-- ================================================== -->
+
+    <div class="sticky top-0 z-30 bg-gray-50">
+
+        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+
+
+            <!-- BUSCADOR + FILTRO -->
+
+            <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+
+
+                <!-- BUSCADOR -->
+
+                <div class="relative w-full sm:w-80">
+
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+
+                    <input type="text" id="buscar-estudiante"
+                           placeholder="Buscar por carnet o nombre..."
+                           class="w-full bg-gray-50 border border-gray-300 rounded-xl pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:border-[#053e2e] focus:ring-2 focus:ring-[#053e2e]/20">
+
+                </div>
+
+
+                <!-- FILTRO -->
+
+                <div class="relative w-full sm:w-44">
+
+                    <i class="fa-solid fa-filter absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+
+                    <select id="filtro-tipo-estudiante"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-xl pl-10 pr-3 py-2.5 text-sm text-gray-600 focus:outline-none focus:border-[#053e2e] focus:ring-2 focus:ring-[#053e2e]/20 cursor-pointer">
+
+                        <option value="TODOS">Todos</option>
+                        <option value="INTERNO">Internos</option>
+                        <option value="EXTERNO">Externos</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONTADORES -->
+
+            <div class="flex flex-wrap items-center gap-2">
+
+
+                <!-- TOTAL -->
+
+                <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl">
+
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                        <i class="fa-solid fa-users text-xs"></i>
+                    </div>
+
+                    <div>
+                        <p id="contador-estudiantes" class="text-sm font-black text-gray-700">0</p>
+                        <p class="text-[9px] text-gray-400 uppercase font-bold">Total</p>
+                    </div>
+
+                </div>
+
+
+                <!-- INTERNOS -->
+
+                <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl">
+
+                    <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                        <i class="fa-solid fa-house text-xs"></i>
+                    </div>
+
+                    <div>
+                        <p id="contador-internos" class="text-sm font-black text-emerald-600">0</p>
+                        <p class="text-[9px] text-gray-400 uppercase font-bold">Internos</p>
+                    </div>
+
+                </div>
+
+
+                <!-- EXTERNOS -->
+
+                <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl">
+
+                    <div class="w-8 h-8 rounded-lg bg-orange-100 text-orange-500 flex items-center justify-center">
+                        <i class="fa-solid fa-person-walking-arrow-right text-xs"></i>
+                    </div>
+
+                    <div>
+                        <p id="contador-externos" class="text-sm font-black text-orange-500">0</p>
+                        <p class="text-[9px] text-gray-400 uppercase font-bold">Externos</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- TABLA ESTUDIANTES -->
+    <!-- ================================================== -->
+
+  <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+
+    <div class="max-h-[calc(100vh-370px)] overflow-y-auto">
+
+        <table class="w-full text-left text-sm">
+
+            <thead class="sticky top-0 z-20 bg-[#1e40af] text-white uppercase text-xs font-bold shadow-sm">
+
+                <tr>
+                    <th class="py-3 px-6">Foto</th>
+                    <th class="py-3 px-6">Carnet</th>
+                    <th class="py-3 px-6">Nombre Completo</th>
+                    <th class="py-3 px-6">Carrera / Año</th>
+                    <th class="py-3 px-6">Procedencia</th>
+                    <th class="py-3 px-6 text-center">Operaciones</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody class="divide-y divide-gray-100 font-medium" id="tabla-estudiantes-body">
+
+                {% for e in estudiantes %}
+
+                <tr id="row-{{ e.carnet }}"
+                    data-carnet="{{ e.carnet }}"
+                    data-nombres="{{ e.nombres }}"
+                    data-apellidos="{{ e.apellidos }}"
+                    data-carrera="{{ e.carrera }}"
+                    data-edad="{{ e.edad_estudi }}"
+                    data-ano="{{ e.anocarrera }}"
+                    data-procedencia="{{ e.procedencia|default:'' }}"
+                    data-estado-internado="{{ e.estado_internado }}"
+                    class="hover:bg-gray-50 transition">
+
+
+                    <!-- FOTO -->
+
+                    <td class="py-4 px-6">
+
+                        {% if e.foto_estudi %}
+
+                            <img src="{{ e.foto_estudi }}"
+                                 alt="{{ e.nombres }}"
+                                 class="w-9 h-9 rounded-full object-cover border border-gray-200 shadow-sm">
+
+                        {% else %}
+
+                            <div class="w-9 h-9 rounded-full bg-[#053e2e] text-white flex items-center justify-center font-black text-xs">
+                                {{ e.nombres|slice:":1"|upper }}
+                            </div>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- CARNET -->
+
+                    <td class="py-4 px-6 font-mono text-xs text-gray-600 font-bold">
+                        {{ e.carnet }}
+                    </td>
+
+
+                    <!-- NOMBRE -->
+
+                    <td class="py-4 px-6">
+                        {{ e.nombres }} {{ e.apellidos }}
+                    </td>
+
+
+                    <!-- CARRERA -->
+
+                    <td class="py-4 px-6 text-xs text-gray-500">
+                        {{ e.carrera }} ({{ e.anocarrera }})
+                    </td>
+
+
+                    <!-- PROCEDENCIA -->
+
+                    <td class="py-4 px-6 text-xs">
+                        {{ e.procedencia|default:"—" }}
+                    </td>
+
+
+                    <!-- OPERACIONES -->
+
+                    <td class="py-4 px-6 text-center space-x-3">
+
+                        <button onclick="abrirModalEditar(this)"
+                                class="text-blue-600 hover:text-blue-800 cursor-pointer"
+                                title="Editar">
+
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+
+
+                        <button onclick="abrirModalEliminar(this)"
+                                class="text-red-600 hover:text-red-800 cursor-pointer"
+                                title="Eliminar">
+
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+
+                <!-- SIN RESULTADOS -->
+
+                <tr id="sin-resultados" class="hidden">
+
+                    <td colspan="6" class="py-10 px-6 text-center">
+
+                        <div class="text-gray-300 text-2xl mb-2">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+
+                        <p class="text-gray-400 text-sm font-semibold">
+                            No se encontraron estudiantes con ese filtro.
+                        </p>
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- MODAL CREAR / EDITAR -->
+<!-- ====================================================== -->
+
+<div id="modal-form" class="fixed inset-0 bg-black/50 items-center justify-center z-50 hidden">
+
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+
+        <h3 id="modal-title" class="text-lg font-black text-gray-800 uppercase border-b pb-2 mb-4">
+            Registrar Estudiante
+        </h3>
+
+
+        <form id="form-estudiante" onsubmit="saveEstudiante(event)" class="space-y-4 text-sm">
+
+
+            <!-- FOTO -->
+
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Fotografía</label>
+
+                <input type="file" id="form-foto" accept="image/*"
+                       class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+            </div>
+
+
+            <!-- CARNET -->
+
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Carnet</label>
+
+                <input type="text" id="form-carnet" required
+                       class="w-full border border-gray-300 rounded-xl p-2.5 focus:outline-none">
+            </div>
+
+
+            <!-- NOMBRES / APELLIDOS -->
+
+            <div class="grid grid-cols-2 gap-3">
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nombres</label>
+
+                    <input type="text" id="form-nombres" required
+                           class="w-full border border-gray-300 rounded-xl p-2.5 focus:outline-none">
+                </div>
+
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Apellidos</label>
+
+                    <input type="text" id="form-apellidos" required
+                           class="w-full border border-gray-300 rounded-xl p-2.5 focus:outline-none">
+                </div>
+
+            </div>
+
+
+            <!-- CARRERA -->
+
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Carrera</label>
+
+                <input type="text" id="form-carrera" required
+                       class="w-full border border-gray-300 rounded-xl p-2.5 focus:outline-none">
+            </div>
+
+
+            <!-- EDAD / TIPO -->
+
+            <div class="grid grid-cols-2 gap-3">
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Edad</label>
+
+                    <input type="number" id="form-edad" min="15" max="99" required
+                           class="w-full border border-gray-300 rounded-xl p-2.5 focus:outline-none">
+                </div>
+
+
+                <div>
+
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">
+                        Tipo de estudiante
+                    </label>
+
+                    <select id="form-estado-internado" required
+                            class="w-full border border-gray-300 rounded-xl p-2.5 bg-white focus:outline-none">
+
+                        <option value="DENTRO">Interno</option>
+                        <option value="EXTERNO">Externo</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- AÑO / PROCEDENCIA -->
+
+            <div class="grid grid-cols-2 gap-3">
+
+                <div>
+
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Año</label>
+
+                    <select id="form-ano"
+                            class="w-full border border-gray-300 rounded-xl p-2.5 bg-white">
+
+                        <option>1er Año</option>
+                        <option>2do Año</option>
+                        <option>3er Año</option>
+                        <option>4to Año</option>
+                        <option>5to Año</option>
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Procedencia</label>
+
+                    <input type="text" id="form-procedencia"
+                           class="w-full border border-gray-300 rounded-xl p-2.5 focus:outline-none">
+
+                </div>
+
+            </div>
+
+
+            <!-- BOTONES -->
+
+            <div class="flex justify-end space-x-2 pt-4 border-t">
+
+                <button type="button" onclick="closeModal('form')"
+                        class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold text-xs cursor-pointer">
+
+                    Cancelar
+                </button>
+
+
+                <button type="submit"
+                        class="px-4 py-2 bg-[#053e2e] text-white rounded-xl font-bold text-xs shadow-md cursor-pointer">
+
+                    Guardar
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- MODAL ELIMINAR -->
+<!-- ====================================================== -->
+
+<div id="modal-delete" class="fixed inset-0 bg-black/50 items-center justify-center z-50 hidden">
+
+    <div class="bg-white w-full max-w-xs rounded-2xl p-6 text-center shadow-2xl">
+
+        <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+            <i class="fa-solid fa-trash-can"></i>
+        </div>
+
+        <h3 class="text-md font-bold text-gray-800 uppercase mb-1">¿Eliminar?</h3>
+
+        <p class="text-xs text-gray-400 mb-6">
+            Esta acción no se puede deshacer.
+        </p>
+
+        <input type="hidden" id="delete-target-carnet">
+
+
+        <div class="flex justify-center space-x-2">
+
+            <button onclick="closeModal('delete')"
+                    class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold text-xs cursor-pointer">
+
+                Cancelar
+            </button>
+
+
+            <button onclick="executeDelete()"
+                    class="px-4 py-2 bg-red-600 text-white rounded-xl font-bold text-xs shadow-md cursor-pointer">
+
+                Eliminar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- CARGANDO ELIMINACIÓN -->
+<!-- ====================================================== -->
+
+<div id="modal-loading-delete" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+
+    <div class="bg-white w-full max-w-xs rounded-2xl p-8 text-center shadow-2xl">
+
+        <div class="w-14 h-14 border-4 border-gray-200 border-t-red-600 rounded-full animate-spin mx-auto mb-5"></div>
+
+        <h3 class="text-lg font-black text-gray-800 mb-2">
+            Eliminando estudiante...
+        </h3>
+
+        <p class="text-xs text-gray-400">
+            Espere un momento mientras se elimina el registro.
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- ÉXITO ELIMINACIÓN -->
+<!-- ====================================================== -->
+
+<div id="modal-success-delete" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+
+    <div class="bg-white w-full max-w-lg rounded-3xl p-10 text-center shadow-2xl">
+
+        <div class="w-28 h-28 rounded-full border-4 border-red-100 flex items-center justify-center mx-auto mb-6">
+            <i class="fa-solid fa-check text-6xl text-red-500"></i>
+        </div>
+
+        <h3 class="text-3xl font-black text-gray-700 mb-3">
+            Eliminado correctamente
+        </h3>
+
+        <p class="text-base text-gray-400 mb-8">
+            El estudiante fue eliminado exitosamente del sistema.
+        </p>
+
+        <button id="btn-ok-delete" type="button"
+                class="bg-red-500 hover:bg-red-600 text-white px-12 py-3 rounded-xl text-base font-black shadow-md cursor-pointer">
+
+            OK
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- CARGANDO EXCEL -->
+<!-- ====================================================== -->
+
+<div id="modal-loading-excel" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+
+    <div class="bg-white w-full max-w-xs rounded-2xl p-8 text-center shadow-2xl">
+
+        <div class="w-14 h-14 border-4 border-gray-200 border-t-[#053e2e] rounded-full animate-spin mx-auto mb-5"></div>
+
+        <h3 class="text-lg font-black text-gray-800 mb-2">
+            Cargando Excel...
+        </h3>
+
+        <p class="text-xs text-gray-400">
+            Espere un momento mientras se guardan los estudiantes.
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- ÉXITO EXCEL -->
+<!-- ====================================================== -->
+
+<div id="modal-success-excel" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+
+    <div class="bg-white w-full max-w-lg rounded-3xl p-10 text-center shadow-2xl">
+
+        <div class="w-28 h-28 rounded-full border-4 border-emerald-100 flex items-center justify-center mx-auto mb-6">
+            <i class="fa-solid fa-check text-6xl text-emerald-500"></i>
+        </div>
+
+        <h3 class="text-3xl font-black text-gray-700 mb-3">
+            Guardados correctamente
+        </h3>
+
+        <p class="text-base text-gray-400 mb-6">
+            Los estudiantes fueron importados exitosamente a la base de datos.
+        </p>
+
+        <div id="success-excel-detalle" class="bg-gray-50 border border-gray-100 rounded-2xl p-5 text-base text-gray-600 mb-8">
+            Estudiantes importados correctamente.
+        </div>
+
+        <button id="btn-ok-excel" type="button"
+                class="bg-sky-400 hover:bg-sky-500 text-white px-12 py-3 rounded-xl text-base font-black shadow-md cursor-pointer">
+
+            OK
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- CARGANDO GUARDADO -->
+<!-- ====================================================== -->
+
+<div id="modal-loading-guardar" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+
+    <div class="bg-white w-full max-w-xs rounded-2xl p-8 text-center shadow-2xl">
+
+        <div class="w-16 h-16 border-4 border-gray-200 border-t-[#053e2e] rounded-full animate-spin mx-auto mb-5"></div>
+
+        <h3 class="text-lg font-black text-gray-800 mb-2">
+            Guardando estudiante...
+        </h3>
+
+        <p class="text-xs text-gray-400">
+            Espere un momento mientras se guardan los datos.
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- ÉXITO GUARDADO -->
+<!-- ====================================================== -->
+
+<div id="modal-success-guardar" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+
+    <div class="bg-white w-full max-w-md rounded-3xl p-10 text-center shadow-2xl">
+
+        <div class="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
+            <i class="fa-solid fa-check text-5xl text-emerald-500"></i>
+        </div>
+
+        <h3 class="text-2xl font-black text-gray-800 mb-3">
+            Guardado exitosamente
+        </h3>
+
+        <p class="text-sm text-gray-500 mb-8">
+            Los datos del estudiante fueron guardados correctamente.
+        </p>
+
+        <button id="btn-ok-guardar" type="button"
+                class="bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-3 rounded-xl text-sm font-black shadow-md cursor-pointer">
+
+            Aceptar
+        </button>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+<script>
+
+let currentMode = "create";
+
+
+// =========================================================
+// GENERALES
+// =========================================================
+
+function getCookie(name) {
+    let cookieValue = null;
+
+    if (document.cookie && document.cookie !== "") {
+        for (let cookie of document.cookie.split(";")) {
+            cookie = cookie.trim();
+
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+
+    return cookieValue;
+}
+
+
+function closeModal(tipo) {
+    const modal = document.getElementById("modal-" + tipo);
+
+    if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    }
+}
+
+
+function mostrarModal(id) {
+    const modal = document.getElementById(id);
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+
+// =========================================================
+// CREAR / EDITAR / ELIMINAR
+// =========================================================
+
+function openModal(type, data = null) {
+
+    const form = document.getElementById("form-estudiante");
+
+
+    if (type === "create") {
+
+        currentMode = "create";
+
+        form.reset();
+
+        document.getElementById("modal-title").innerText = "Registrar Estudiante";
+        document.getElementById("form-carnet").disabled = false;
+
+        mostrarModal("modal-form");
+    }
+
+
+    else if (type === "update") {
+
+        currentMode = "update";
+
+        form.reset();
+
+        document.getElementById("modal-title").innerText = "Actualizar Estudiante";
+
+        document.getElementById("form-carnet").value = data.carnet;
+        document.getElementById("form-carnet").disabled = true;
+
+        document.getElementById("form-nombres").value = data.nombres;
+        document.getElementById("form-apellidos").value = data.apellidos;
+        document.getElementById("form-carrera").value = data.carrera;
+        document.getElementById("form-edad").value = data.edad;
+        document.getElementById("form-ano").value = data.ano;
+        document.getElementById("form-procedencia").value = data.procedencia;
+
+        const selector = document.getElementById("form-estado-internado");
+
+        selector.value = data.estadoInternado === "EXTERNO" ? "EXTERNO" : "DENTRO";
+        selector.dataset.estadoOriginal = data.estadoInternado;
+
+        mostrarModal("modal-form");
+    }
+
+
+    else if (type === "delete") {
+
+        document.getElementById("delete-target-carnet").value = data;
+
+        mostrarModal("modal-delete");
+    }
+}
+
+
+function abrirModalEditar(btn) {
+
+    const row = btn.closest("tr");
+
+    openModal("update", {
+        carnet: row.dataset.carnet,
+        nombres: row.dataset.nombres,
+        apellidos: row.dataset.apellidos,
+        carrera: row.dataset.carrera,
+        edad: row.dataset.edad,
+        ano: row.dataset.ano,
+        procedencia: row.dataset.procedencia,
+        estadoInternado: row.dataset.estadoInternado
+    });
+}
+
+
+function abrirModalEliminar(btn) {
+
+    const row = btn.closest("tr");
+
+    if (!row) return;
+
+    openModal("delete", row.dataset.carnet);
+}
+
+
+// =========================================================
+// GUARDAR ESTUDIANTE
+// =========================================================
+
+function saveEstudiante(e) {
+
+    e.preventDefault();
+
+    const selectorEstado = document.getElementById("form-estado-internado");
+    let estadoInternado = selectorEstado.value;
+
+    if (currentMode === "update" && selectorEstado.dataset.estadoOriginal === "FUERA" && selectorEstado.value === "DENTRO") {
+        estadoInternado = "FUERA";
+    }
+
+
+    const data = new FormData();
+
+    data.append("carnet", document.getElementById("form-carnet").value);
+    data.append("nombres", document.getElementById("form-nombres").value);
+    data.append("apellidos", document.getElementById("form-apellidos").value);
+    data.append("carrera", document.getElementById("form-carrera").value);
+    data.append("edad", document.getElementById("form-edad").value);
+    data.append("ano", document.getElementById("form-ano").value);
+    data.append("procedencia", document.getElementById("form-procedencia").value);
+    data.append("estado_internado", estadoInternado);
+
+
+    const foto = document.getElementById("form-foto").files[0];
+
+    if (foto) data.append("foto", foto);
+
+
+    const url = currentMode === "update" ? "/actualizar-estudiante/" : "/crear-estudiante/";
+
+
+    mostrarCargandoGuardar();
+
+
+    fetch(url, {
+        method: "POST",
+        headers: {"X-CSRFToken": getCookie("csrftoken")},
+        body: data
+    })
+
+    .then(res => res.json())
+
+    .then(res => {
+
+        ocultarCargandoGuardar();
+
+        if (res.mensaje === "ok") {
+            closeModal("form");
+            mostrarExitoGuardar();
+        } else {
+            alert("Error al guardar: " + res.detalle);
+        }
+
+    })
+
+    .catch(error => {
+        ocultarCargandoGuardar();
+        alert("Error de conexión.");
+        console.log(error);
+    });
+}
+
+
+// =========================================================
+// ELIMINAR ESTUDIANTE
+// =========================================================
+
+function executeDelete() {
+
+    const carnet = document.getElementById("delete-target-carnet").value;
+
+    const data = new FormData();
+    data.append("carnet", carnet);
+
+
+    closeModal("delete");
+    mostrarCargandoEliminar();
+
+
+    fetch("/eliminar-estudiante/", {
+        method: "POST",
+        headers: {"X-CSRFToken": getCookie("csrftoken")},
+        body: data
+    })
+
+    .then(res => res.json())
+
+    .then(res => {
+
+        ocultarCargandoEliminar();
+
+
+        if (res.mensaje === "ok") {
+
+            const row = document.getElementById(`row-${carnet}`);
+
+            if (row) row.remove();
+
+            actualizarContadoresEstudiantes();
+            filtrarEstudiantes();
+
+            mostrarExitoEliminar();
+
+        } else {
+
+            alert("Error al eliminar: " + res.detalle);
+
+        }
+
+    })
+
+    .catch(error => {
+        ocultarCargandoEliminar();
+        alert("Error de conexión al eliminar.");
+        console.log(error);
+    });
+}
+
+
+// =========================================================
+// BUSCADOR + FILTRO
+// =========================================================
+
+function normalizarTexto(texto) {
+    return (texto || "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+}
+
+
+function filtrarEstudiantes() {
+
+    const texto = normalizarTexto(document.getElementById("buscar-estudiante").value);
+    const filtro = document.getElementById("filtro-tipo-estudiante").value;
+    const filas = document.querySelectorAll("#tabla-estudiantes-body tr[data-carnet]");
+    const sinResultados = document.getElementById("sin-resultados");
+
+    let visibles = 0;
+
+
+    filas.forEach(fila => {
+
+        const carnet = normalizarTexto(fila.dataset.carnet);
+        const nombres = normalizarTexto(fila.dataset.nombres);
+        const apellidos = normalizarTexto(fila.dataset.apellidos);
+        const estado = (fila.dataset.estadoInternado || "").trim().toUpperCase();
+
+        const coincideTexto = texto === "" || carnet.includes(texto) || nombres.includes(texto) || apellidos.includes(texto) || `${nombres} ${apellidos}`.includes(texto);
+
+        const esInterno = estado === "DENTRO" || estado === "FUERA" || estado === "INTERNO";
+        const esExterno = estado === "EXTERNO";
+
+        const coincideTipo = filtro === "TODOS" || (filtro === "INTERNO" && esInterno) || (filtro === "EXTERNO" && esExterno);
+        const mostrar = coincideTexto && coincideTipo;
+
+        fila.style.display = mostrar ? "" : "none";
+
+        if (mostrar) visibles++;
+    });
+
+
+    if (sinResultados) sinResultados.classList.toggle("hidden", visibles !== 0);
+}
+
+
+// =========================================================
+// CONTADORES
+// =========================================================
+
+function actualizarContadoresEstudiantes() {
+
+    const filas = document.querySelectorAll("#tabla-estudiantes-body tr[data-carnet]");
+
+    let internos = 0;
+    let externos = 0;
+
+
+    filas.forEach(fila => {
+
+        const estado = (fila.dataset.estadoInternado || "").trim().toUpperCase();
+
+        if (estado === "DENTRO" || estado === "FUERA" || estado === "INTERNO") internos++;
+        else if (estado === "EXTERNO") externos++;
+    });
+
+
+    document.getElementById("contador-estudiantes").innerText = filas.length;
+    document.getElementById("contador-internos").innerText = internos;
+    document.getElementById("contador-externos").innerText = externos;
+}
+
+
+// =========================================================
+// MODALES GUARDAR -->
+// =========================================================
+
+function mostrarCargandoGuardar() {
+    mostrarModal("modal-loading-guardar");
+}
+
+
+function ocultarCargandoGuardar() {
+    closeModal("loading-guardar");
+}
+
+
+function mostrarExitoGuardar() {
+
+    mostrarModal("modal-success-guardar");
+
+    document.getElementById("btn-ok-guardar").onclick = () => location.reload();
+}
+
+
+// =========================================================
+// MODALES ELIMINAR
+// =========================================================
+
+function mostrarCargandoEliminar() {
+    mostrarModal("modal-loading-delete");
+}
+
+
+function ocultarCargandoEliminar() {
+    closeModal("loading-delete");
+}
+
+
+function mostrarExitoEliminar() {
+
+    mostrarModal("modal-success-delete");
+
+    document.getElementById("btn-ok-delete").onclick = () => closeModal("success-delete");
+}
+
+
+// =========================================================
+// EXCEL
+// =========================================================
+
+function handleCSVSelect() {
+
+    const btn = document.getElementById("btn-upload-csv");
+    const input = document.getElementById("csv-file-input");
+
+    if (input.files.length > 0) {
+        btn.disabled = false;
+        btn.classList.remove("opacity-50", "cursor-not-allowed");
+    }
+}
+
+
+function processCSV() {
+
+    const input = document.getElementById("csv-file-input");
+    const archivo = input.files[0];
+    const btn = document.getElementById("btn-upload-csv");
+
+
+    if (!archivo) {
+        alert("Seleccione un archivo Excel primero.");
+        return;
+    }
+
+
+    const data = new FormData();
+    data.append("archivo", archivo);
+
+
+    mostrarCargandoExcel();
+
+    btn.disabled = true;
+    btn.classList.add("opacity-50", "cursor-not-allowed");
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Cargando...';
+
+
+    fetch("/importar-excel/", {
+        method: "POST",
+        headers: {"X-CSRFToken": getCookie("csrftoken")},
+        body: data
+    })
+
+    .then(res => res.json())
+
+    .then(res => {
+
+        ocultarCargandoExcel();
+
+        if (res.mensaje === "ok") {
+            mostrarExitoExcel(res.creados, res.repetidos, res.errores);
+        } else {
+            restaurarBotonExcel();
+            alert("Error al importar: " + res.detalle);
+        }
+
+    })
+
+    .catch(error => {
+        ocultarCargandoExcel();
+        restaurarBotonExcel();
+        alert("Error de conexión al importar Excel.");
+        console.log(error);
+    });
+}
+
+
+function mostrarCargandoExcel() {
+    mostrarModal("modal-loading-excel");
+}
+
+
+function ocultarCargandoExcel() {
+    closeModal("loading-excel");
+}
+
+
+function mostrarExitoExcel(creados, repetidos, errores) {
+
+    const detalle = document.getElementById("success-excel-detalle");
+
+    detalle.innerHTML = `
+        <div class="grid grid-cols-1 gap-3 text-left">
+
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-gray-500">Estudiantes guardados:</span>
+                <strong class="text-emerald-600 text-xl">${creados}</strong>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-gray-500">Repetidos ignorados:</span>
+                <strong class="text-amber-500 text-xl">${repetidos}</strong>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-gray-500">Filas con error:</span>
+                <strong class="text-red-500 text-xl">${errores}</strong>
+            </div>
+
+        </div>
+    `;
+
+
+    mostrarModal("modal-success-excel");
+
+    document.getElementById("btn-ok-excel").onclick = () => location.reload();
+}
+
+
+function restaurarBotonExcel() {
+
+    const btn = document.getElementById("btn-upload-csv");
+    const input = document.getElementById("csv-file-input");
+
+    btn.disabled = false;
+    btn.classList.remove("opacity-50", "cursor-not-allowed");
+    btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-2"></i>Cargar Excel';
+
+    input.value = "";
+}
+
+
+// =========================================================
+// INICIO
+// =========================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const buscador = document.getElementById("buscar-estudiante");
+    const filtro = document.getElementById("filtro-tipo-estudiante");
+
+    if (buscador) buscador.addEventListener("input", filtrarEstudiantes);
+    if (filtro) filtro.addEventListener("change", filtrarEstudiantes);
+
+    actualizarContadoresEstudiantes();
+    filtrarEstudiantes();
+});
+
+</script>
+
+{% endblock %}
