@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_scanner"
+        android:icon="@drawable/outline_document_scanner_24"
+        android:title="Scanner" />
+
+    <item
+        android:id="@+id/nav_historial"
+        android:icon="@drawable/outline_history_24"
+        android:title="Historial" />
+
+    <item
+        android:id="@+id/nav_dasword"
+        android:icon="@drawable/baseline_auto_graph_24"
+        android:title="Dashboard" />
+
+    <item
+        android:id="@+id/nav_perfil"
+        android:icon="@drawable/baseline_person_24"
+        android:title="Perfil" />
+
+</menu>

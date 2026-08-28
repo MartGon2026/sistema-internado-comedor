@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">SCAI Control</string>
+    <string name="bienvenido">Bienvenido</string>
+    <string name="subtitulo_login">Al comedor-internado</string>
+    <string name="usuario">Usuario</string>
+    <string name="contrasena">Contraseña</string>
+    <string name="hint_usuario">Ingrese su usuario</string>
+    <string name="hint_password">......</string>
+    <string name="btn_ingresar">INGRESAR</string>
+    <string name="guarda_de_seguridad">Guarda de Seguridad</string>
+    <string name="bienvenido_">Bienvenido, ----</string>
+    <string name="instruccion_escaneo">Escanea el código QR del estudiante</string>
+    <string name="btn_scaner_ahora">Escanear Ahora</string>
+    <string name="titulo_historial">Historial de Registros</string>
+    <string name="subtitulo_historial">Estudiantes en movimiento hoy</string>
+    <string name="titulo_dashboard">Dashboard</string>
+    <string name="subtitulo_dashboard">Estado general del internado</string>
+    <string name="filtro_todos">Todos</string>
+    <string name="filtro_fuera">Fuera</string>
+    <string name="filtro_dentro">Dentro</string>
+</resources>
