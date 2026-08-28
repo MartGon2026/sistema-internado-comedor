@@ -13,3 +13,11 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Pagina Web Django
+PaginaWeb_Admi/WEntorno/
+__pycache__/
+*.pyc
+.env
+*.zip
+PaginaWeb_Admi/ExamenAPK/db.sqlite3
