@@ -65,7 +65,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
           Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo",
-                modifier = Modifier.size(75.dp)
+                modifier = Modifier.size(75.dp git stat)
           )
 
         }
