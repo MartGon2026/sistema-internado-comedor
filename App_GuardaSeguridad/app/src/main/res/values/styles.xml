@@ -1,0 +1,8 @@
+<resources>
+
+    <style name="DialogAnim">
+        <item name="android:windowEnterAnimation">@anim/dialog_scale</item>
+        <item name="android:windowExitAnimation">@anim/dialog_fade</item>
+    </style>
+
+</resources>
